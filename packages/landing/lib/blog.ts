@@ -8,6 +8,11 @@ import { BlogPost, BlogPostMetadata } from '@/types/blog';
 
 const postsDirectory = path.join(process.cwd(), 'content/blog');
 
+/** Strip the leading markdown H1 — the page template renders a single H1 from frontmatter. */
+function stripLeadingH1(content: string): string {
+  return content.replace(/^#\s+.+\n+/, '');
+}
+
 export function getAllPosts(): BlogPost[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
@@ -19,7 +24,8 @@ export function getAllPosts(): BlogPost[] {
     .map((fileName) => {
       const fullPath = path.join(postsDirectory, fileName);
       const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data, content } = matter(fileContents);
+      const { data, content: rawContent } = matter(fileContents);
+      const content = stripLeadingH1(rawContent);
 
       // Process markdown to HTML
       const processedContent = remark()

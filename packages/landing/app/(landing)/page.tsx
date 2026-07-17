@@ -1,5 +1,6 @@
 // app/(landing)/page.tsx
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Inbox, MessageSquare, Video } from 'lucide-react';
 import { Demo } from './demo/demo';
@@ -62,13 +63,14 @@ export default function Page() {
               <p className="text-muted-foreground mb-4">
                 Get AI-driven suggestions for folders, tags, filenames &
                 formatting. Click to apply in the Organizer or automate the full
-                process via the dedicated Inbox folder. <br />
-                <br />
-                {/* Drag and drop your notes into the dedicated "Inbox" folder for instant organization.
-              Or get more control by choosing suggestions in the organizer sidepanel. */}
-                {/* Note Companion automatically detects relevant tags and suggests the best folder for your note.
-        Drag and drop your notes into the dedicated "Inbox" folder for instant organization.
-        Or get more control by choosing suggestions in the organizer sidepanel. */}
+                process via the dedicated Inbox folder.{' '}
+                <Link
+                  href="/blog/how-to-automate-your-second-brain"
+                  className="font-medium text-primary underline underline-offset-2 hover:no-underline"
+                >
+                  Learn how to build a second brain in Obsidian
+                </Link>{' '}
+                with AI.
               </p>
             </div>
             {/* Chat Feature */}

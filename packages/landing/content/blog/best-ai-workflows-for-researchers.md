@@ -1,13 +1,11 @@
 ---
-title: 'Best AI Workflows for Researchers (Using Obsidian as a Second Brain)'
+title: 'Best AI Research Workflows in Obsidian (2026)'
 slug: 'best-ai-workflows-for-researchers'
 date: '2025-12-12'
 category: 'Guides'
 tags: ['research', 'ai', 'obsidian', 'workflow', 'productivity']
 excerpt: "Researchers today don't struggle with a lack of information. They struggle with too much information, scattered across tools. Learn proven AI-powered research workflows you can implement today."
 ---
-
-# Best AI Workflows for Researchers (Using Obsidian as a Second Brain)
 
 Researchers today don't struggle with a lack of information.
 
@@ -22,7 +20,7 @@ The best AI workflows for researchers combine:
 - Context-aware AI assistance
 - Long-term knowledge retention
 
-This guide walks through proven AI-powered research workflows, with real examples you can implement today using Obsidian. For a software-agnostic take on the same themes, see [optimizing AI workflows for students and researchers](/blog/optimizing-ai-workflows-for-students-and-researchers).
+This guide walks through proven AI-powered research workflows, with real examples you can implement today in an [Obsidian second brain](/blog/how-to-automate-your-second-brain). For a software-agnostic take on the same themes, see [optimizing AI workflows for students and researchers](/blog/optimizing-ai-workflows-for-students-and-researchers).
 
 ## Why Most AI Tools Fail Researchers
 

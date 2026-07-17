@@ -12,7 +12,7 @@ image: '/blog/images/using-ai-to-connect-ideas-across-your-vault.png'
 
 ## Introduction
 
-One of the greatest strengths of a well-maintained knowledge vault is the ability to connect ideas across disparate notes, revealing insights you might not have seen otherwise. However, manually finding these connections can be time-consuming and overwhelming as your vault grows. This is where AI-assisted workflows come into play—especially [vault-native AI](/blog/why-vault-native-ai-outperforms-generic-chatbots-for-note-taking) that reads your notes in context rather than treating each query in isolation.
+One of the greatest strengths of a well-maintained knowledge vault is the ability to connect ideas across disparate notes, revealing insights you might not have seen otherwise. However, manually finding these connections can be time-consuming and overwhelming as your vault grows. This is where AI-assisted workflows come into play — especially within an [Obsidian second brain](/blog/how-to-automate-your-second-brain) and [vault-native AI](/blog/why-vault-native-ai-outperforms-generic-chatbots-for-note-taking) that reads your notes in context rather than treating each query in isolation.
 
 In this post, we'll explore how AI can be harnessed to connect ideas across your vault, practical workflows to implement this, and a concrete example to illustrate the process.
 
@@ -90,4 +90,4 @@ Integrating AI to connect ideas across your vault can transform your knowledge m
 
 Start small, experiment with AI-assisted linking, and iteratively refine your process. Over time, you’ll find your vault becoming a richer and more powerful tool for thinking and learning.
 
-If you want to bring this workflow into Obsidian, Note Companion is one option to explore. For scaling connections across your vault, see [how to automate your second brain](/blog/how-to-automate-your-second-brain).
+If you want to bring this workflow into Obsidian, Note Companion is one option to explore. For the full setup — foundation through automation — see our [Obsidian second brain](/blog/how-to-automate-your-second-brain) guide.

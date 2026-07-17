@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BlogContent } from "../components/blog-content";
+import { BlogFaqSchema } from "../components/blog-faq-schema";
 import { RelatedPosts } from "../components/related-posts";
 import { getPostBySlug, getAllPosts, getRelatedPosts } from "@/lib/blog";
 
@@ -37,11 +38,15 @@ export async function generateMetadata({
   const metadata: Metadata = {
     title: post.title,
     description: post.excerpt,
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: "article",
       publishedTime: post.date,
+      ...(post.updated && { modifiedTime: post.updated }),
       ...(post.image && { images: [post.image] }),
     },
     ...(post.image && {
@@ -66,6 +71,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="bg-background">
+      {post.faq && post.faq.length > 0 && <BlogFaqSchema faq={post.faq} />}
       <div className="max-w-4xl mx-auto px-6 py-12 lg:px-8">
         {/* Back Button */}
         <Link href="/blog">
@@ -81,19 +87,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <Badge variant="secondary" className="text-xs font-medium">
               {post.category}
             </Badge>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" />
+                <time dateTime={post.date}>
+                  {new Date(post.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
+              {post.updated && post.updated !== post.date && (
+                <span>
+                  Updated{" "}
+                  <time dateTime={post.updated}>
+                    {new Date(post.updated).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </span>
+              )}
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 leading-tight text-gray-900">
-            {post.title}
+            {post.headline ?? post.title}
           </h1>
           <p className="text-xl text-gray-600 mb-6 leading-relaxed">
             {post.excerpt}

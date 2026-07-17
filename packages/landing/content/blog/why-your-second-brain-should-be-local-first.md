@@ -12,7 +12,7 @@ image: '/blog/images/why-your-second-brain-should-be-local-first.png'
 
 ## The Concept of a Second Brain
 
-A "second brain" is a personal knowledge management system designed to help you capture, organize, and retrieve information effortlessly. Whether you’re a writer, researcher, student, or knowledge worker, a second brain acts as an external memory, freeing up mental space and boosting creativity. Many people lean on cloud-based tools for this, but there’s a compelling case for making your second brain local-first. For a broader critique of cloud-only setups, see [the case against cloud-only knowledge management](/blog/case-against-cloud-only-knowledge-management).
+A "second brain" is a personal knowledge management system designed to help you capture, organize, and retrieve information effortlessly. Whether you’re a writer, researcher, student, or knowledge worker, a second brain acts as an external memory, freeing up mental space and boosting creativity. If you're building yours in Obsidian, start with our [Obsidian second brain](/blog/how-to-automate-your-second-brain) guide — this post focuses on why local-first matters for the architecture. Many people lean on cloud-based tools for this, but there’s a compelling case for making your second brain local-first. For a broader critique of cloud-only setups, see [the case against cloud-only knowledge management](/blog/case-against-cloud-only-knowledge-management).
 
 A local-first approach means your notes and data live primarily on your own device, rather than entirely in the cloud. You might sync or back up to the cloud, but the authoritative copy is on your local storage. This setup brings a unique set of advantages that can transform how you interact with your knowledge.
 

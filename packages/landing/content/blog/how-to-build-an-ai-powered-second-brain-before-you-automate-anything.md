@@ -15,9 +15,7 @@ They wire up workflows, summaries, and smart connections before they've answered
 
 **What do I actually want this system to do for my thinking?**
 
-AI can dramatically improve a second brain — but only if you're clear about what stays human and what gets delegated. Once the foundation is solid, [how to automate your second brain](/blog/how-to-automate-your-second-brain) walks through Obsidian + AI workflows.
-
-This article is about that line. Once the foundation is solid, [how to automate your second brain](/blog/how-to-automate-your-second-brain) walks through Obsidian + AI workflows.
+AI can dramatically improve a second brain — but only if you're clear about what stays human and what gets delegated. This article is about that line. Once the foundation is solid, see our guide to [build a second brain in Obsidian](/blog/how-to-automate-your-second-brain) for the full setup and automation walkthrough.
 
 ## A Second Brain Is a Thinking System, Not a Storage System
 
