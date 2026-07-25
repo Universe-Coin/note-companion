@@ -330,13 +330,10 @@ export const chatTools = {
   },
 
   deleteFiles: {
-    description: 'Delete paths (confirm in UI)',
+    description: 'Delete paths (confirm in UI; files move to trash)',
     parameters: z.object({
       filePaths: z.array(z.string()).describe('Paths'),
       reason: z.string().describe('Why delete'),
-      permanentDelete: z
-        .boolean()
-        .describe('Skip trash; default false'),
     }),
   },
 

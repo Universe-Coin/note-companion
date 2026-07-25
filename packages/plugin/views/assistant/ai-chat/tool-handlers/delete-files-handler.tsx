@@ -7,7 +7,6 @@ import { ToolHandlerProps } from "./types";
 interface DeleteFilesArgs {
   filePaths: string[];
   reason?: string;
-  permanentDelete?: boolean;
 }
 
 export function DeleteFilesHandler({
@@ -52,21 +51,13 @@ export function DeleteFilesHandler({
   }, [toolInvocation, app]);
 
   const handleConfirmDelete = async () => {
-    const { permanentDelete = false } = toolInvocation.args as DeleteFilesArgs;
-
     const results: Array<{ path: string; success: boolean; error?: string }> = [];
     let deletedCount = 0;
     let failedCount = 0;
 
     for (const file of validFiles) {
       try {
-        if (permanentDelete) {
-          // Permanent deletion must bypass trash; trashFile has no permanent option.
-          // eslint-disable-next-line obsidianmd/prefer-file-manager-trash-file -- intentional permanent delete
-          await app.vault.delete(file);
-        } else {
-          await app.fileManager.trashFile(file);
-        }
+        await app.fileManager.trashFile(file);
         results.push({ path: file.path, success: true });
         deletedCount++;
       } catch (error) {
@@ -83,9 +74,7 @@ export function DeleteFilesHandler({
 
     setIsDone(true);
 
-    const message = permanentDelete
-      ? `Permanently deleted ${deletedCount} file(s)`
-      : `Moved ${deletedCount} file(s) to trash`;
+    const message = `Moved ${deletedCount} file(s) to trash`;
 
     const resultMessage =
       failedCount > 0
@@ -126,8 +115,7 @@ export function DeleteFilesHandler({
     );
   };
 
-  const { reason, permanentDelete = false } =
-    toolInvocation.args as DeleteFilesArgs;
+  const { reason } = toolInvocation.args as DeleteFilesArgs;
   const isComplete = "result" in toolInvocation;
 
   if (isComplete || isDone) {
@@ -185,13 +173,7 @@ export function DeleteFilesHandler({
       )}
 
       <div className="p-2 bg-[--background-secondary] text-xs text-[--text-warning]">
-        {permanentDelete ? (
-          <>
-            <strong>⚠ Permanent deletion:</strong> Files cannot be recovered
-          </>
-        ) : (
-          <>Files will be moved to trash (can be recovered)</>
-        )}
+        Files will be moved to trash (can be recovered)
       </div>
 
       <div className="flex gap-2">

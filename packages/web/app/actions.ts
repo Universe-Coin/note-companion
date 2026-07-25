@@ -1,6 +1,7 @@
 'use server';
 import { auth } from '@clerk/nextjs/server';
 import { Unkey } from '@unkey/api';
+import { listUnkeyKeysForOwner } from '@/lib/unkey-client';
 import { db, UserUsageTable as UserUsageTableImport } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
@@ -173,68 +174,9 @@ export async function getLicenseKeyFromUserId(
     };
   }
 
-  const unkey = new Unkey({ rootKey: token });
-
   try {
-    // Unkey v2: Try to list keys by ownerId/externalId
-    // The SDK might have keys.list() or similar method
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unkeyAny = unkey as any;
+    const keys = await listUnkeyKeysForOwner(userId, apiId, token);
 
-    // Try different possible methods to list keys
-    let keys: any[] = [];
-
-    // Method 1: Try keys.list() with ownerId
-    if (unkeyAny.keys?.list) {
-      try {
-        const response = await unkeyAny.keys.list({
-          ownerId: userId,
-          apiId,
-        });
-        keys = response?.data?.keys || response?.keys || [];
-      } catch (e) {
-        console.log('keys.list() method not available or failed:', e);
-      }
-    }
-
-    // Method 2: Try keys.listByOwnerId()
-    if (keys.length === 0 && unkeyAny.keys?.listByOwnerId) {
-      try {
-        const response = await unkeyAny.keys.listByOwnerId({
-          ownerId: userId,
-          apiId,
-        });
-        keys = response?.data?.keys || response?.keys || [];
-      } catch (e) {
-        console.log('keys.listByOwnerId() method not available or failed:', e);
-      }
-    }
-
-    // Method 3: Try direct API call to v2 endpoint if SDK methods don't work
-    if (keys.length === 0) {
-      try {
-        // Unkey v2: Use v2 API endpoint with ownerId parameter
-        const response = await fetch(
-          `https://api.unkey.com/v2/keys?ownerId=${userId}`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          keys = data?.keys || [];
-        }
-      } catch (e) {
-        console.log('Direct API call to v2 endpoint failed:', e);
-      }
-    }
-
-    // If we found keys, return the first one (most recent)
-    // Note: Unkey doesn't return the actual key string for security,
-    // only metadata. We'll need to handle this differently.
     if (keys.length > 0) {
       // Since Unkey doesn't return the actual key string when listing,
       // we'll return a flag indicating a key exists

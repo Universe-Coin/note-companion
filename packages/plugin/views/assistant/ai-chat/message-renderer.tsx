@@ -5,7 +5,6 @@ import { AIMarkdown } from "./ai-message-renderer";
 import { UserMarkdown } from "./user-message-renderer";
 import { Message } from "ai";
 import { usePlugin } from "../provider";
-import { Attachment } from "./types/attachments";
 import { AppendButton } from "./components/append-button";
 import { CopyButton } from "./components/copy-button";
 import { RefreshButton } from "./components/refresh-button";

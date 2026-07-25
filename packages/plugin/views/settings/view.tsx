@@ -4,6 +4,10 @@ import FileOrganizer from '../../index';
 import { createRoot, Root } from 'react-dom/client';
 import { SettingsTabContent } from './main';
 import { logMessage } from '../../someUtils';
+import {
+  getNoteCompanionSettingDefinitions,
+  type NoteCompanionSettingDefinition,
+} from './setting-definitions';
 
 export class FileOrganizerSettingTab extends PluginSettingTab {
   plugin: FileOrganizer;
@@ -12,6 +16,15 @@ export class FileOrganizerSettingTab extends PluginSettingTab {
   constructor(app: App, plugin: FileOrganizer) {
     super(app, plugin);
     this.plugin = plugin;
+  }
+
+  /**
+   * Obsidian 1.13+ declarative settings for global search indexing.
+   * On 1.13+, Obsidian renders from these definitions instead of display().
+   * display() remains for Obsidian versions before 1.13 (minAppVersion 1.8.7).
+   */
+  getSettingDefinitions(): NoteCompanionSettingDefinition[] {
+    return getNoteCompanionSettingDefinitions(this.plugin);
   }
 
   display(): void {

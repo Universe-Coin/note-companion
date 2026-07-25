@@ -1,6 +1,9 @@
 import { clerkClient, auth } from '@clerk/nextjs/server';
-import { Unkey } from '@unkey/api';
 import { NextRequest } from 'next/server';
+import {
+  extractUserId,
+  verifyUnkeyApiKey,
+} from './unkey-client';
 import {
   checkTokenUsage,
   createEmptyUserUsage,
@@ -207,78 +210,17 @@ async function handleApiKeyAuth(
     });
     logger.info('Attempting API key authentication');
 
-    // Unkey v2: verifyKey is a method on the Unkey instance
-    // It takes an object with 'key' property
-    let unkey;
-    try {
-      unkey = new Unkey({
-        rootKey: process.env.UNKEY_ROOT_KEY || '',
-      });
-      console.log('[handleApiKeyAuth] Unkey instance created successfully');
-    } catch (unkeyError) {
-      console.error('[handleApiKeyAuth] Failed to create Unkey instance', {
-        error:
-          unkeyError instanceof Error ? unkeyError.message : String(unkeyError),
-        stack: unkeyError instanceof Error ? unkeyError.stack : undefined,
-      });
-      throw unkeyError;
-    }
-
-    // Try verifyKey method (v2 API) - takes object with 'key' property
-    // Include apiId if available (keys are scoped to an API)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let response: any = null;
-    const apiId = process.env.UNKEY_API_ID;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const verifyParams: any = { key: token };
-    if (apiId) {
-      verifyParams.apiId = apiId;
-      logger.info('Including apiId in verification', { apiId });
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (unkey.keys?.verifyKey) {
-        response = await unkey.keys.verifyKey(verifyParams);
-      } else if (unkey.verifyKey) {
-        response = await unkey.verifyKey(verifyParams);
-      } else if (unkey.keys?.verify) {
-        response = await unkey.keys.verify(verifyParams);
-      }
-    } catch (err) {
-      const error = err;
-      logger.error('Unkey verification error', err, {
-        message: error?.message,
-        statusCode: error?.statusCode,
-      });
-      // Try to extract response from error
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (error?.data$) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        response = error.data$;
-      }
-    }
-
-    // Handle v2 response format (wrapped in data)
-    // Note: Keeping backward compatibility check for response.result in case of edge cases
-    const result =
-      response && ('data' in response ? response.data : response.result);
-    const error = response?.error;
+    const { result, error } = await verifyUnkeyApiKey(token);
 
     logger.info('Unkey verification result', {
-      hasResponse: !!response,
       hasResult: !!result,
       valid: result?.valid,
       code: result?.code,
       error: error?.message || error?.detail,
     });
 
-    // Direct console.log for debugging
-    // Unkey v2 uses identity.externalId or identity.id instead of ownerId
-    const userId =
-      result?.identity?.externalId || result?.identity?.id || result?.ownerId;
+    const userId = extractUserId(result);
     console.log('[handleApiKeyAuth] Unkey verification result', {
-      hasResponse: !!response,
       hasResult: !!result,
       valid: result?.valid,
       code: result?.code,

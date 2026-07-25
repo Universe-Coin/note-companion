@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { promises as fsPromises } from 'node:fs';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { Unkey } from '@unkey/api';
+import { extractUserId, verifyUnkeyApiKey } from '@/lib/unkey-client';
 import {
   checkAudioTranscriptionQuota,
   incrementAudioTranscriptionUsage,
@@ -166,49 +166,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Unkey v2: Use Unkey instance for verification
-    const unkey = new Unkey({
-      rootKey: process.env.UNKEY_ROOT_KEY || '',
-    });
-
-    // Try verifyKey method (v2 API) - takes object with 'key' property
-    // Include apiId if available (keys are scoped to an API)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let response: any = null;
-    const apiId = process.env.UNKEY_API_ID;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const verifyParams: any = { key: key };
-    if (apiId) {
-      verifyParams.apiId = apiId;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((unkey as any).keys?.verifyKey) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response = await (unkey as any).keys.verifyKey(verifyParams);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if ((unkey as any).verifyKey) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response = await (unkey as any).verifyKey(verifyParams);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if ((unkey as any).keys?.verify) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response = await (unkey as any).keys.verify(verifyParams);
-    }
-
-    // Handle v2 response format (wrapped in data)
-    // Note: Keeping backward compatibility check for response.result in case of edge cases
-    const result =
-      response && ('data' in response ? response.data : response.result);
-    const error = response?.error;
+    const { result, error } = await verifyUnkeyApiKey(key);
 
     if (error || !result || !result.valid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Extract userId from Unkey result
-    const userId =
-      result?.identity?.externalId || result?.identity?.id || result?.ownerId;
+    const userId = extractUserId(result);
 
     if (!userId) {
       return NextResponse.json(

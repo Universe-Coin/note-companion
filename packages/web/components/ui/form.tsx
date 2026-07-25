@@ -84,9 +84,10 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = 'FormItem';
 
-// Type assertion to work around React 19 type compatibility
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FormLabel = React.forwardRef<any, any>(({ className, ...props }, ref) => {
+const FormLabel = React.forwardRef<
+  React.ComponentRef<typeof Label>,
+  React.ComponentPropsWithoutRef<typeof Label>
+>(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
@@ -97,19 +98,21 @@ const FormLabel = React.forwardRef<any, any>(({ className, ...props }, ref) => {
       {...props}
     />
   );
-});
+}) as React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof Label> &
+    React.RefAttributes<React.ComponentRef<typeof Label>>
+>;
 FormLabel.displayName = 'FormLabel';
 
-// Type assertion to work around React 19 type compatibility
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SlotComponent = Slot as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FormControl = React.forwardRef<any, any>(({ ...props }, ref) => {
+const FormControl = React.forwardRef<
+  React.ComponentRef<typeof Slot>,
+  React.ComponentPropsWithoutRef<typeof Slot>
+>(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
-    <SlotComponent
+    <Slot
       ref={ref}
       id={formItemId}
       aria-describedby={
@@ -121,7 +124,10 @@ const FormControl = React.forwardRef<any, any>(({ ...props }, ref) => {
       {...props}
     />
   );
-});
+}) as React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof Slot> &
+    React.RefAttributes<React.ComponentRef<typeof Slot>>
+>;
 FormControl.displayName = 'FormControl';
 
 const FormDescription = React.forwardRef<

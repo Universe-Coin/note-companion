@@ -63,7 +63,9 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
 
       try {
         const leaf = plugin.app.workspace.getMostRecentLeaf();
-        const tempContainer = activeDocument.createElement("div");
+        const tempContainer = plugin.app.workspace.containerEl.createDiv({
+          cls: "markdown-content-temp-render",
+        });
 
         if (leaf?.view instanceof MarkdownView) {
           await MarkdownRenderer.render(
@@ -96,6 +98,7 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
         });
 
         setRenderedContent(tempContainer.innerHTML);
+        tempContainer.remove();
       } catch (e) {
         logger.error("Error rendering markdown:", e);
         setRenderedContent(`<p>Error rendering content: ${e instanceof Error ? e.message : String(e)}</p>`);
@@ -128,6 +131,9 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
         dangerouslySetInnerHTML={{ __html: renderedContent }}
       />
       <style>{`
+        .markdown-content-temp-render {
+          display: none !important;
+        }
         .markdown-content-wrapper .markdown-rendered {
           margin: 0 !important;
           padding: 0 !important;
