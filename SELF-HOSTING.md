@@ -370,6 +370,24 @@ If you host **Whisper** (audio transcription) separately from Ollama, set `OPENA
 - Ensure you have write permissions in the installation directory
 - On Linux/Mac, you might need to use `sudo` for port numbers below 1024
 
+#### OCR / vision fails on self-hosted (OpenRouter, pasted images)
+
+- **`/api/health` OK does not test vision** — health only confirms the server is up
+- **Use a vision-capable model** on the server (not in the Obsidian plugin). For OpenRouter:
+
+  ```env
+  ENABLE_USER_MANAGEMENT=false
+  OPENAI_API_BASE=https://openrouter.ai/api/v1
+  OPENAI_API_KEY=sk-or-v1-...
+  MODEL_PROVIDER=openai
+  MODEL_NAME=openai/gpt-4o
+  ```
+
+- **`MODEL_PROVIDER=anthropic` does not support OCR/vision** in Note Companion
+- **If you migrated from Vercel lifetime hosting:** if `SOLO_API_KEY` is set in Docker, the plugin **License Key** must match it — or remove `SOLO_API_KEY` for simple self-hosting
+- **Error: `The "data" argument must be of type string or Buffer… Received undefined`** — usually missing/invalid image data. Check Docker logs during a failed `/api/vision` request and try a small PNG saved to disk (not a pasted image) to isolate Obsidian file-read issues
+- **Enable Debug Mode** in plugin settings (Advanced tab) for full error text in the in-plugin log viewer
+
 ### Checking Logs
 
 View server logs:
@@ -451,11 +469,13 @@ DATABASE_URL=postgresql://user:password@localhost:5432/notecompanion
 Configure processing limits in `.env`:
 
 ```env
-MAX_FILE_SIZE=10485760  # 10MB in bytes
+MAX_FILE_SIZE=10485760  # 10MB in bytes — enforced on /api/vision image payloads
 MAX_TOKENS_PER_REQUEST=8000
 RATE_LIMIT_REQUESTS=100
 RATE_LIMIT_WINDOW=900000  # 15 minutes in ms
 ```
+
+> **Note:** `MAX_FILE_SIZE` is currently enforced for OCR/vision (`/api/vision`). Other limits above are configuration placeholders and may not be wired to every endpoint yet.
 
 ### Custom Models
 

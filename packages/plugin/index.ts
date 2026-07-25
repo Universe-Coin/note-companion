@@ -1247,7 +1247,6 @@ export default class FileOrganizer extends Plugin {
   }
 
   isWebP(fileContent: Buffer): boolean {
-    // Check if the file starts with the WebP signature
     return (
       fileContent.slice(0, 4).toString("hex") === "52494646" &&
       fileContent.slice(8, 12).toString("hex") === "57454250"
@@ -1256,15 +1255,19 @@ export default class FileOrganizer extends Plugin {
 
   async generateImageAnnotation(file: TFile) {
     const arrayBuffer = await this.app.vault.readBinary(file);
+    if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+      throw new Error(`Could not read image file: ${file.path}`);
+    }
     const fileContent = Buffer.from(arrayBuffer);
     const imageSize = fileContent.byteLength;
     const imageSizeInMB2 = imageSize / (1024 * 1024);
     logMessage(`Image size: ${imageSizeInMB2.toFixed(2)} MB`);
 
     let processedArrayBuffer: ArrayBuffer;
-
-    if (!this.isWebP(fileContent)) {
-      // Compress the image if it's not a WebP
+    if (this.isWebP(fileContent)) {
+      // Jimp 0.22 cannot decode WebP — send raw bytes; server sniffs image/webp
+      processedArrayBuffer = arrayBuffer;
+    } else {
       const resizedImage = await this.compressImage(fileContent);
       const compressedBytes = new Uint8Array(
         resizedImage.buffer,
@@ -1272,9 +1275,6 @@ export default class FileOrganizer extends Plugin {
         resizedImage.byteLength
       );
       processedArrayBuffer = compressedBytes.slice().buffer;
-    } else {
-      // If it's a WebP, use the original file content directly
-      processedArrayBuffer = arrayBuffer;
     }
 
     const processedContent = await this.extractTextFromImage(
@@ -1285,6 +1285,10 @@ export default class FileOrganizer extends Plugin {
   }
 
   async extractTextFromImage(image: ArrayBuffer): Promise<string> {
+    if (!image || image.byteLength === 0) {
+      throw new Error("Image data is empty");
+    }
+
     const base64Image = arrayBufferToBase64(image);
 
     const response = await obsidianFetch(`${this.getServerUrl()}/api/vision`, {
@@ -1307,8 +1311,15 @@ export default class FileOrganizer extends Plugin {
       throw new Error(errorMessage);
     }
 
-    const { text } = await readResponseJson<VisionResponse>(response);
-    return text;
+    const data = await readResponseJson<VisionResponse & ApiErrorBody>(response);
+    const apiError = getApiError(data);
+    if (apiError) {
+      throw new Error(apiError);
+    }
+    if (typeof data.text !== "string") {
+      throw new Error("Vision API returned no extracted text");
+    }
+    return data.text;
   }
 
   async getBacklog() {
