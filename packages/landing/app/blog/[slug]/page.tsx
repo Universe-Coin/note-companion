@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BlogContent } from "../components/blog-content";
 import { BlogFaqSchema } from "../components/blog-faq-schema";
 import { BlogPostingSchema } from "../components/blog-posting-schema";
+import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
 import { RelatedPosts } from "../components/related-posts";
 import { getPostBySlug, getAllPosts, getRelatedPosts } from "@/lib/blog";
 
@@ -73,6 +74,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="bg-background">
       <BlogPostingSchema post={post} />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://www.notecompanion.ai' },
+          { name: 'Blog', url: 'https://www.notecompanion.ai/blog' },
+          {
+            name: post.headline ?? post.title,
+            url: `https://www.notecompanion.ai/blog/${post.slug}`,
+          },
+        ]}
+      />
       {post.faq && post.faq.length > 0 && <BlogFaqSchema faq={post.faq} />}
       <div className="max-w-4xl mx-auto px-6 py-12 lg:px-8">
         {/* Back Button */}
