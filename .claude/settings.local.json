@@ -15,7 +15,8 @@
       "Bash(pnpm list:*)",
       "Bash(pnpm why:*)",
       "Bash(npm view:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "mcp__seo__seo_list_reports"
     ],
     "deny": []
   }
