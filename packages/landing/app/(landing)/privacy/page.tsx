@@ -1,4 +1,14 @@
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'How Note Companion collects, uses, and protects your account, usage, and vault content data.',
+  alternates: {
+    canonical: '/privacy',
+  },
+};
 
 export default function PrivacyPolicyPage() {
   return (
@@ -68,7 +78,7 @@ export default function PrivacyPolicyPage() {
         </p>
 
         <div className="text-sm text-gray-600 mt-8 border-t pt-4">
-          Last updated: {new Date().toISOString().split('T')[0]}
+          Last updated: 2026-01-11
         </div>
       </div>
     </div>

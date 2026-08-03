@@ -2,6 +2,7 @@ import { GeistSans } from 'geist/font/sans';
 import './globals.css';
 import { Metadata } from 'next';
 import Providers from './providers';
+import { OrganizationSchema } from '@/components/organization-schema';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body className="bg-background" suppressHydrationWarning>
+        <OrganizationSchema />
         <Providers>{children}</Providers>
       </body>
     </html>

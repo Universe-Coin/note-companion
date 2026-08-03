@@ -1,4 +1,14 @@
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description:
+    'The terms for using Note Companion, including licensing, paid plans, and content ownership.',
+  alternates: {
+    canonical: '/terms-of-service',
+  },
+};
 
 export default function TermsOfServicePage() {
   return (
@@ -92,7 +102,7 @@ export default function TermsOfServicePage() {
         </p>
 
         <div className="text-sm text-gray-600 mt-8 border-t pt-4">
-          Last updated: {new Date().toISOString().split('T')[0]}
+          Last updated: 2026-01-11
         </div>
       </div>
     </div>

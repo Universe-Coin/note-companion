@@ -8,6 +8,8 @@ import { PricingCards } from './components/pricing-cards';
 import { FaqSection } from './components/faq-section';
 import { HeroSection } from './hero-section';
 import Image from 'next/image';
+import { SoftwareApplicationSchema } from '@/components/software-application-schema';
+import { FaqPageSchema } from '@/components/faq-page-schema';
 
 export const metadata: Metadata = {
   title: 'Your AI-powered Knowledge Partner',
@@ -28,6 +30,8 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <div className="flex min-h-screen w-full flex-col items-center bg-background text-foreground">
+      <SoftwareApplicationSchema />
+      <FaqPageSchema />
       <section className="w-full bg-gradient-to-b from-primary/[0.06] via-background to-background">
         <HeroSection />
       </section>

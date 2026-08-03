@@ -15,7 +15,6 @@ const siteUrl =
     : 'https://www.notecompanion.ai');
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
   title: {
     default: 'Note Companion - Your AI-powered Knowledge Partner',
     template: '%s | Note Companion',
@@ -36,9 +35,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Note Companion - Your AI-powered Knowledge Partner',
-    description:
-      'Your AI-powered assistant that turns scattered notes into actionable knowledge. Seamless meeting notes, instant organization, and the smartest AI chat for your Obsidian workflow.',
     images: ['/notecompanion.png'],
   },
 };
@@ -133,8 +129,22 @@ export default async function RootLayout({
             <div className="flex w-full flex-1 flex-col">{children}</div>
 
             <footer className="mt-auto w-full border-t border-border bg-muted/20">
-              <div className="mx-auto max-w-7xl px-6 py-8 text-center text-sm text-muted-foreground">
-                Copyright © {year} JPF Nexus Inc. All rights reserved.
+              <div className="mx-auto max-w-7xl px-6 py-8 flex flex-col items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4">
+                  <Link href="/mobile" className="hover:text-foreground">
+                    Mobile
+                  </Link>
+                  <Link href="/privacy" className="hover:text-foreground">
+                    Privacy
+                  </Link>
+                  <Link
+                    href="/terms-of-service"
+                    className="hover:text-foreground"
+                  >
+                    Terms
+                  </Link>
+                </div>
+                <div>Copyright © {year} JPF Nexus Inc. All rights reserved.</div>
               </div>
             </footer>
           </div>
