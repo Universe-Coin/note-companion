@@ -9,14 +9,12 @@ const heroCtaFill =
 
 type HeroShimmerCtaProps = {
   href: string;
-  reduceMotion: boolean;
   children: ReactNode;
   className?: string;
 };
 
 export function HeroShimmerCta({
   href,
-  reduceMotion,
   children,
   className,
 }: HeroShimmerCtaProps) {
@@ -24,7 +22,7 @@ export function HeroShimmerCta({
     '--spread': '90deg',
     '--radius': '100px',
     '--cut': '2px',
-    '--hero-shimmer-speed': reduceMotion ? '0s' : '2.25s',
+    '--hero-shimmer-speed': '2.25s',
     '--shimmer-peak': 'color-mix(in srgb, white 70%, hsl(var(--primary)) 30%)',
   } as CSSProperties;
 
@@ -37,9 +35,8 @@ export function HeroShimmerCta({
       className={cn(
         'group relative mx-auto inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 overflow-hidden whitespace-nowrap px-8 py-3.5 text-sm font-semibold text-primary-foreground',
         'rounded-[var(--radius)] transition-all duration-300',
-        'hover:scale-[1.04] hover:shadow-[0_0_36px_8px_hsl(var(--primary)/0.45)]',
+        'hover:scale-[1.04] hover:shadow-[0_0_36px_8px_hsl(var(--primary)/0.45)] motion-reduce:hover:scale-100',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        reduceMotion && 'hover:scale-100',
         className
       )}
       style={{
@@ -47,20 +44,18 @@ export function HeroShimmerCta({
         background: heroCtaFill,
       }}
     >
-      {!reduceMotion && (
-        <div className="pointer-events-none absolute inset-0 overflow-visible [container-type:size]">
-          {/* cqw/cqh from this layer (not the <a>) so the link is not size-contained. */}
+      <div className="hero-shimmer-layer pointer-events-none absolute inset-0 overflow-visible [container-type:size]">
+        {/* cqw/cqh from this layer (not the <a>) so the link is not size-contained. */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 aspect-square max-w-none -translate-x-1/2 -translate-y-1/2"
+          style={{ width: 'max(100cqw, 100cqh)' }}
+        >
           <div
-            className="pointer-events-none absolute left-1/2 top-1/2 aspect-square max-w-none -translate-x-1/2 -translate-y-1/2"
-            style={{ width: 'max(100cqw, 100cqh)' }}
-          >
-            <div
-              className="hero-shimmer-spin absolute inset-[-100%] animate-hero-shimmer-spin [transform-origin:center]"
-              style={{ background: shimmerBackground }}
-            />
-          </div>
+            className="hero-shimmer-spin absolute inset-[-100%] animate-hero-shimmer-spin [transform-origin:center]"
+            style={{ background: shimmerBackground }}
+          />
         </div>
-      )}
+      </div>
       <div
         className="pointer-events-none absolute rounded-[var(--radius)] [inset:var(--cut)]"
         style={{ background: heroCtaFill }}

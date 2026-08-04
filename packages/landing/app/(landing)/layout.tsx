@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Toaster } from '@/components/ui/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import Providers from '../providers';
 import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
@@ -48,7 +47,6 @@ export default async function RootLayout({
   const year = new Date().getFullYear();
   return (
     <TooltipProvider>
-      <Providers>
         <main className="min-h-screen flex flex-col items-center">
           <div className="flex-1 w-full flex flex-col items-center">
             {/* <div className="w-full bg-gray-900">
@@ -150,7 +148,6 @@ export default async function RootLayout({
           </div>
         </main>
         <Toaster />
-      </Providers>
     </TooltipProvider>
   );
 }

@@ -68,10 +68,16 @@ const config = {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" },
         },
+        "hero-fade-up": {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "hero-shimmer-spin":
           "hero-shimmer-spin var(--hero-shimmer-speed, 2.25s) linear infinite",
+        "hero-fade-up":
+          "hero-fade-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },
     },
   },

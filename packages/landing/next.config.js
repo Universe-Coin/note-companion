@@ -18,7 +18,7 @@ const nextConfig = {
   },
   skipTrailingSlashRedirect: true,
   images: {
-    domains: ['framerusercontent.com'],
+    domains: ['framerusercontent.com', 'img.youtube.com'],
   },
   // Skip generating static error pages that are causing issues
   typescript: {

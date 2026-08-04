@@ -3,11 +3,12 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Inbox, MessageSquare, Video } from 'lucide-react';
-import { Demo } from './demo/demo';
+import { DemoSection } from './components/demo-section';
 import { PricingCards } from './components/pricing-cards';
 import { FaqSection } from './components/faq-section';
 import { HeroSection } from './hero-section';
 import Image from 'next/image';
+import { YouTubeEmbed } from '@/components/youtube-embed';
 import { SoftwareApplicationSchema } from '@/components/software-application-schema';
 import { FaqPageSchema } from '@/components/faq-page-schema';
 
@@ -135,6 +136,7 @@ export default function Page() {
                     width={700}
                     height={700}
                     alt="Organization Features"
+                    loading="lazy"
                     className="w-full h-auto"
                   />
                 </div>
@@ -163,6 +165,7 @@ export default function Page() {
                     width={500}
                     height={500}
                     alt="Auto-Organization"
+                    loading="lazy"
                     className="w-full h-auto"
                   />
                 </div>
@@ -190,6 +193,7 @@ export default function Page() {
                     width={500}
                     height={500}
                     alt="AI Chat Features"
+                    loading="lazy"
                     className="w-full h-auto"
                   />
                 </div>
@@ -246,18 +250,7 @@ export default function Page() {
         </div>
       </div> */}
 
-      {/* Demo Section */}
-      <div className="hidden w-full max-w-[1200px] px-6 py-20 md:py-28 bg-muted/50 backdrop-blur-sm lg:block">
-        <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            What it looks like in your vault
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Experience how Note Companion transforms your workflow
-          </p>
-        </div>
-        <Demo />
-      </div>
+      <DemoSection />
 
       {/* Testimonials Section */}
       <section
@@ -352,26 +345,14 @@ export default function Page() {
             See it in action
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="relative aspect-video overflow-hidden rounded-2xl ring-1 ring-border shadow-sm">
-              <iframe
-                src="https://www.youtube.com/embed/IcfgdJ6b4hk?iv_load_policy=3&rel=0&modestbranding=1&playsinline=1"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-[100%] h-full"
-                suppressHydrationWarning
-              ></iframe>
-            </div>
-            <div className="relative aspect-video overflow-hidden rounded-2xl ring-1 ring-border shadow-sm">
-              <iframe
-                src="https://www.youtube.com/embed/lUo3AVnlSsI?iv_load_policy=3&rel=0&modestbranding=1&playsinline=1"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-                suppressHydrationWarning
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId="IcfgdJ6b4hk"
+              title="Note Companion tutorial video"
+            />
+            <YouTubeEmbed
+              videoId="lUo3AVnlSsI"
+              title="Note Companion feature walkthrough"
+            />
           </div>
         </div>
       </section>
