@@ -6,14 +6,19 @@ interface BlogPostingSchemaProps {
 
 const siteUrl = 'https://www.notecompanion.ai';
 
+/** Frontmatter dates are plain YYYY-MM-DD; Article schema requires a timezone. */
+function toIsoDateTime(date: string): string {
+  return date.includes('T') ? date : `${date}T00:00:00Z`;
+}
+
 export function BlogPostingSchema({ post }: BlogPostingSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.headline ?? post.title,
     description: post.excerpt,
-    datePublished: post.date,
-    dateModified: post.updated ?? post.date,
+    datePublished: toIsoDateTime(post.date),
+    dateModified: toIsoDateTime(post.updated ?? post.date),
     ...(post.image && { image: `${siteUrl}${post.image}` }),
     author: {
       '@type': 'Organization',
