@@ -147,9 +147,6 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.19(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.8.5)(typescript@5.3.3)))
-      '@tanstack/react-query':
-        specifier: ^5.0.0
-        version: 5.67.2(react@19.0.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -171,9 +168,6 @@ importers:
       next:
         specifier: 15.2.6
         version: 15.2.6(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.1(react@19.0.1))(react@19.0.1)
-      next-themes:
-        specifier: ^0.2.1
-        version: 0.2.1(next@15.2.6(@opentelemetry/api@1.9.0)(@playwright/test@1.51.0)(react-dom@19.0.1(react@19.0.1))(react@19.0.1))(react-dom@19.0.1(react@19.0.1))(react@19.0.1)
       posthog-js:
         specifier: ^1.203.2
         version: 1.229.5
@@ -5383,14 +5377,6 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
 
-  '@tanstack/query-core@5.67.2':
-    resolution: {integrity: sha512-+iaFJ/pt8TaApCk6LuZ0WHS/ECVfTzrxDOEL9HH9Dayyb5OVuomLzDXeSaI2GlGT/8HN7bDGiRXDts3LV+u6ww==}
-
-  '@tanstack/react-query@5.67.2':
-    resolution: {integrity: sha512-6Sa+BVNJWhAV4QHvIqM73norNeGRWGC3ftN0Ix87cmMvI215I1wyJ44KUTt/9a0V9YimfGcg25AITaYVel71Og==}
-    peerDependencies:
-      react: ^18 || ^19
-
   '@testing-library/jest-dom@6.6.3':
     resolution: {integrity: sha512-IteBhl4XqYNkM54f4ejhLRJiZNqcSCoXUOG2CPK7qbD322KjQozM4kHQOfkG2oln9b9HTYqs+Sae8vBATubxxA==}
     engines: {node: '>=14', npm: '>=6', yarn: '>=1'}
@@ -9729,13 +9715,6 @@ packages:
 
   nested-error-stacks@2.0.1:
     resolution: {integrity: sha512-SrQrok4CATudVzBS7coSz26QRSmlK9TzzoFbeKfcPBUFPjcQM9Rqvr/DlJkOrwI/0KcgvMub1n1g5Jt9EgRn4A==}
-
-  next-themes@0.2.1:
-    resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
-    peerDependencies:
-      next: '*'
-      react: '*'
-      react-dom: '*'
 
   next@15.2.6:
     resolution: {integrity: sha512-DIKFctUpZoCq5ok2ztVU+PqhWsbiqM9xNP7rHL2cAp29NQcmDp7Y6JnBBhHRbFt4bCsCZigj6uh+/Gwh2158Wg==}
@@ -17993,13 +17972,6 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.17(ts-node@10.9.2(@types/node@20.8.5)(typescript@5.3.3))
 
-  '@tanstack/query-core@5.67.2': {}
-
-  '@tanstack/react-query@5.67.2(react@19.0.1)':
-    dependencies:
-      '@tanstack/query-core': 5.67.2
-      react: 19.0.1
-
   '@testing-library/jest-dom@6.6.3':
     dependencies:
       '@adobe/css-tools': 4.4.2
@@ -23676,12 +23648,6 @@ snapshots:
   neo-async@2.6.2: {}
 
   nested-error-stacks@2.0.1: {}
-
-  next-themes@0.2.1(next@15.2.6(@opentelemetry/api@1.9.0)(@playwright/test@1.51.0)(react-dom@19.0.1(react@19.0.1))(react@19.0.1))(react-dom@19.0.1(react@19.0.1))(react@19.0.1):
-    dependencies:
-      next: 15.2.6(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.1(react@19.0.1))(react@19.0.1)
-      react: 19.0.1
-      react-dom: 19.0.1(react@19.0.1)
 
   next@15.2.6(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.51.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.1(react@19.0.1))(react@19.0.1):
     dependencies:
