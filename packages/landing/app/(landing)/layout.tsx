@@ -4,8 +4,7 @@ import { Toaster } from '@/components/ui/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
-import { getGitHubStars } from '@/lib/github';
+import { GitHubStarCount } from '@/components/github-star-count';
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -38,12 +37,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const starCount = await getGitHubStars();
   const year = new Date().getFullYear();
   return (
     <TooltipProvider>
@@ -105,15 +103,7 @@ export default async function RootLayout({
                       Blog
                     </Link>
 
-                    <a
-                      href="https://github.com/Nexus-JPF/note-companion"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/80"
-                    >
-                      <Star className="h-4 w-4" />
-                      <span>{starCount}</span>
-                    </a>
+                    <GitHubStarCount />
                     <Link href="https://accounts.notecompanion.ai/sign-up">
                       <Button variant="default" size="sm">
                         Start

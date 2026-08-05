@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Inbox, MessageSquare, Video } from 'lucide-react';
 import { DemoSection } from './components/demo-section';
-import { PricingCards } from './components/pricing-cards';
-import { FaqSection } from './components/faq-section';
+import { PricingSection } from './components/pricing-section';
+import { FaqSectionLazy } from './components/faq-section-lazy';
 import { HeroSection } from './hero-section';
 import Image from 'next/image';
 import { YouTubeEmbed } from '@/components/youtube-embed';
@@ -334,7 +334,7 @@ export default function Page() {
               </p>
             </div> */}
           </div>
-          <PricingCards />
+          <PricingSection />
         </div>
       </div>
 
@@ -381,7 +381,7 @@ export default function Page() {
       </div>
 
       {/* FAQ Section */}
-      <FaqSection />
+      <FaqSectionLazy />
     </div>
   );
 }

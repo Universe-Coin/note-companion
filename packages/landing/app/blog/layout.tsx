@@ -1,15 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
-import { getGitHubStars } from '@/lib/github';
+import { GitHubStarCount } from '@/components/github-star-count';
 
-export default async function BlogLayout({
+export default function BlogLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const starCount = await getGitHubStars();
 
   return (
     <div className="min-h-screen flex flex-col items-center">
@@ -49,15 +47,7 @@ export default async function BlogLayout({
                   blog
                 </Link>
 
-                <a
-                  href="https://github.com/Nexus-JPF/note-companion"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/80"
-                >
-                  <Star className="h-4 w-4" />
-                  <span>{starCount}</span>
-                </a>
+                <GitHubStarCount />
                 <Link href="https://accounts.notecompanion.ai/sign-up">
                   <Button variant="default" size="sm">
                     Start

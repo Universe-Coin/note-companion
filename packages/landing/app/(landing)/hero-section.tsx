@@ -48,7 +48,6 @@ export function HeroSection() {
           <YouTubeEmbed
             videoId="X4yN4ykTJIo"
             title="Note Companion demo video"
-            thumbnailPriority
           />
         </div>
       </div>
