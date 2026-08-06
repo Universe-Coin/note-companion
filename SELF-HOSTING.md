@@ -370,6 +370,27 @@ If you host **Whisper** (audio transcription) separately from Ollama, set `OPENA
 - Ensure you have write permissions in the installation directory
 - On Linux/Mac, you might need to use `sudo` for port numbers below 1024
 
+#### Vercel build fails: invalid maxDuration (Hobby plan)
+
+If you deploy to **Vercel Hobby**, the build may fail with:
+
+```text
+Builder returned invalid maxDuration value for Serverless Function "api/...".
+Serverless Functions must have a maxDuration between 1 and 300 for plan hobby.
+```
+
+Several API routes set `maxDuration = 800` (the Vercel **Pro** limit) for long-running work such as transcription and formatting. Hobby allows a maximum of **300 seconds**, so the deploy fails at build time before the app runs.
+
+**Affected routes include:** `format`, `format-stream`, `enhance-meeting-note`, `transcribe`, `process-file`, `trigger-processing`, and `process-pending-uploads`.
+
+**Options:**
+
+1. **Recommended:** Self-host with **Docker**, **local Node** (`pnpm build:self-host` + `pnpm start`), or a VPS. These paths are not limited by Vercel plan caps.
+2. **Vercel Pro:** Deploy on a Pro plan if you want to stay on Vercel with the current timeout settings.
+3. **Vercel Hobby fork:** In your fork, change `maxDuration` from `800` to `300` in the routes above. Builds will succeed, but very long transcription or formatting jobs may hit the 5-minute limit.
+
+Self-hosting does **not** require a paid Vercel plan. Docker and local setup are the supported paths in this guide.
+
 #### OCR / vision fails on self-hosted (OpenRouter, pasted images)
 
 - **`/api/health` OK does not test vision** — health only confirms the server is up
