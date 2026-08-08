@@ -28,7 +28,7 @@
     "geist": "^1.2.1",
     "lucide-react": "^0.323.0",
     "next": "15.2.6",
-    "posthog-js": "^1.203.2",
+    "posthog-js": "^1.414.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "react-circular-progressbar": "^2.1.0",

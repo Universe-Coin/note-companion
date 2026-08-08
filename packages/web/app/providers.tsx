@@ -11,6 +11,7 @@ if (typeof window !== "undefined") {
     person_profiles: "identified_only",
     capture_pageview: false, // Disable automatic pageview capture, as we capture manually
     capture_pageleave: true, // Enable pageleave capture
+    capture_performance: { web_vitals: true },
   });
 }
 
