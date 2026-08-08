@@ -18,12 +18,13 @@ export default function PostHogRoot() {
           capture_pageview: false,
           capture_pageleave: true,
           disable_session_recording: true,
+          capture_performance: { web_vitals: true },
         })
         setClient(posthog)
       })
     }
 
-    if ('requestIdleCallback' in window) {
+    if (typeof window.requestIdleCallback === 'function') {
       const id = window.requestIdleCallback(initPostHog, { timeout: 3000 })
       return () => window.cancelIdleCallback(id)
     }
