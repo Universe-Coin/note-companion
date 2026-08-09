@@ -17,7 +17,8 @@ import Markdown from 'react-native-markdown-display';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { TextDocumentViewer } from '@/components/text-document-viewer';
 import { FilePreview } from '@/components/file-preview';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
+import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
@@ -247,15 +248,13 @@ export default function FileViewerScreen() {
   };
 
   const renderDocumentView = () => {
-    if (params.mimeType?.includes('pdf')) {
+    if (params.mimeType?.includes('pdf') && params.fileUrl) {
       return (
         <View style={styles.pdfContainer}>
-          <Pdf
-            source={{ uri: params.fileUrl, cache: true }}
+          <WebView
+            source={{ uri: params.fileUrl }}
             style={styles.pdfView}
-            trustAllCerts={false}
-            enablePaging={true}
-            page={1}
+            originWhitelist={['*']}
           />
         </View>
       );
@@ -373,7 +372,7 @@ export default function FileViewerScreen() {
           </View>
           <TouchableOpacity 
             style={[styles.headerButton, styles.shareButton]} 
-            onPress={() => { void handleShare(); }}
+            onPress={handleShare}
           >
             <MaterialIcons name="share" size={24} color="#68D391" />
           </TouchableOpacity>

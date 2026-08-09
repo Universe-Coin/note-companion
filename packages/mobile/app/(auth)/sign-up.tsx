@@ -10,14 +10,15 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useOAuth, useSignUp } from '@clerk/clerk-expo';
+import { useOAuth } from '@clerk/clerk-expo';
+import { useSignUp } from '@clerk/clerk-react';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleGLogo } from '@/components/google-g-logo';
 import { Link } from 'expo-router';
-
-
-WebBrowser.maybeCompleteAuthSession();
+import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
+import { activateClerkSession } from '@/utils/auth-session';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -46,6 +47,11 @@ export default function SignUpScreen() {
       return;
     }
 
+    if (!isLoaded || !signUp) {
+      Alert.alert('Error', 'Sign up is not ready yet. Please try again.');
+      return;
+    }
+
     try {
       setLoading(true);
       const result = await signUp.create({
@@ -54,8 +60,7 @@ export default function SignUpScreen() {
       });
 
       if (result.status === 'complete') {
-        setSignUpActive({ session: result.createdSessionId });
-        router.push('/(tabs)');
+        await activateClerkSession(setSignUpActive, result.createdSessionId);
       } else {
         // Handle additional verification if needed
         console.log(JSON.stringify(result, null, 2));
@@ -69,10 +74,12 @@ export default function SignUpScreen() {
 
   const onSignUpWithGoogle = React.useCallback(async () => {
     try {
-      const { createdSessionId, setActive } = await googleAuth();
+      prepareOAuthBrowserSession();
+      await WebBrowser.warmUpAsync();
+      const redirectUrl = getOAuthRedirectUrl();
+      const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
       if (createdSessionId) {
-        setActive?.({ session: createdSessionId });
-        router.push('/(tabs)');
+        await activateClerkSession(setActive, createdSessionId);
       }
     } catch (err) {
       console.error('OAuth error:', err);
@@ -81,10 +88,12 @@ export default function SignUpScreen() {
 
   const onSignUpWithApple = React.useCallback(async () => {
     try {
-      const { createdSessionId, setActive } = await appleAuth();
+      prepareOAuthBrowserSession();
+      await WebBrowser.warmUpAsync();
+      const redirectUrl = getOAuthRedirectUrl();
+      const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
       if (createdSessionId) {
-        setActive?.({ session: createdSessionId });
-        router.push('/(tabs)');
+        await activateClerkSession(setActive, createdSessionId);
       }
     } catch (err) {
       console.error('OAuth error:', err);
@@ -137,7 +146,7 @@ export default function SignUpScreen() {
           />
           <TouchableOpacity
             style={[styles.button, styles.emailButton]}
-            onPress={() => { void onSignUpWithEmail(); }}
+            onPress={onSignUpWithEmail}
             disabled={loading}
           >
             <Text style={styles.emailButtonText}>
@@ -155,15 +164,15 @@ export default function SignUpScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.googleButton]}
-            onPress={() => { void onSignUpWithGoogle(); }}
+            onPress={onSignUpWithGoogle}
           >
-            <Ionicons name="logo-google" size={24} color="#EA4335" />
+            <GoogleGLogo size={24} />
             <Text style={styles.buttonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.appleButton]}
-            onPress={() => { void onSignUpWithApple(); }}
+            onPress={onSignUpWithApple}
           >
             <View style={styles.appleLogoContainer}>
               <Ionicons name="logo-apple" size={24} color="#FFFFFF" />

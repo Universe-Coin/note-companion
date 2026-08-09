@@ -13,7 +13,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { FileCard } from './FileCard';
 import { fetchFiles, deleteFile, UploadedFile, PaginationData } from '@/utils/api';
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/clerk-react';
 
 interface FileListProps {
   files: UploadedFile[];
@@ -150,8 +150,8 @@ export function FileList({
       renderItem={({ item }) => (
         <FileCard
           file={item}
-          onDelete={(id) => { void handleDelete(id); }}
-          onView={(file) => { void handleView(file); }}
+          onDelete={handleDelete}
+          onView={handleView}
         />
       )}
       contentContainerStyle={styles.listContent}

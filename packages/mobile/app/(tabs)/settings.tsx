@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, Platform, ScrollView, Linking, TouchableOpacity } from 'react-native';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import { Button } from '../../components/Button';
 import { ThemedView } from '../../components/ThemedView';
 import { ThemedText } from '../../components/ThemedText';
@@ -17,7 +17,7 @@ export default function SettingsScreen() {
   const { user } = useUser();
   const primaryColor = useSemanticColor('primary');
   const insets = useSafeAreaInsets();
-  const isUS = Localization.region === 'US';
+  const isUS = Localization.getLocales()[0]?.regionCode === 'US';
 
   type ExtraConfig = { upgradeCheckoutUrl?: string };
   const checkoutUrl = process.env.EXPO_PUBLIC_UPGRADE_CHECKOUT_URL;
@@ -48,7 +48,7 @@ export default function SettingsScreen() {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => { void confirmDeleteAccount(); }
+          onPress: confirmDeleteAccount
         }
       ],
       { cancelable: true }
@@ -121,7 +121,7 @@ export default function SettingsScreen() {
           {isUS && (
             <View style={styles.upgradeSection}>
               <Button
-                onPress={() => { void handleUpgrade(); }}
+                onPress={handleUpgrade}
                 variant="primary"
               >
                 Upgrade on notecompanion.ai
@@ -136,7 +136,7 @@ export default function SettingsScreen() {
                   Tapping "Upgrade on notecompanion.ai" will take you outside the app to complete your purchase. This subscription is managed entirely through our website, not Apple.
                 </ThemedText>
               </View>
-              <TouchableOpacity style={styles.tosLink} onPress={() => { void Linking.openURL('https://notecompanion.ai/terms-of-service'); }}>
+              <TouchableOpacity style={styles.tosLink} onPress={() => Linking.openURL('https://notecompanion.ai/terms-of-service')}>
                 <ThemedText style={styles.tosLinkText}>Terms of Service</ThemedText>
                 <MaterialIcons name="launch" size={16} color={primaryColor} />
               </TouchableOpacity>
@@ -146,7 +146,7 @@ export default function SettingsScreen() {
           {/* Sign Out Button */}
           <View style={styles.signOutContainer}>
             <Button
-              onPress={() => { void signOut(); }}
+              onPress={() => signOut()}
               variant="secondary" 
               textStyle={{color: '#333333', fontWeight: '600'}}
             >
@@ -175,11 +175,11 @@ export default function SettingsScreen() {
         {/* Legal Section */}
         <View style={styles.legalSection}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>Legal</ThemedText>
-          <TouchableOpacity style={styles.legalLink} onPress={() => { void Linking.openURL('https://notecompanion.ai/privacy'); }}> 
+          <TouchableOpacity style={styles.legalLink} onPress={() => Linking.openURL('https://notecompanion.ai/privacy')}> 
             <ThemedText style={styles.legalLinkText}>Privacy Policy</ThemedText>
             <MaterialIcons name="launch" size={16} color={primaryColor} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.legalLink} onPress={() => { void Linking.openURL('https://notecompanion.ai/terms-of-service'); }}>
+          <TouchableOpacity style={styles.legalLink} onPress={() => Linking.openURL('https://notecompanion.ai/terms-of-service')}>
             <ThemedText style={styles.legalLinkText}>Terms of Service</ThemedText>
             <MaterialIcons name="launch" size={16} color={primaryColor} />
           </TouchableOpacity>

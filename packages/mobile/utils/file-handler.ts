@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { API_URL, API_CONFIG } from '@/constants/config';
 
 export type UploadStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'error' | 'pending';
@@ -641,7 +641,7 @@ export const startBackgroundSync = async (token: string): Promise<void> => {
       const hasMoreItems = await processSyncQueue(token);
       if (hasMoreItems) {
         // Schedule next item with a delay
-        window.setTimeout(processNextItem, 5000);
+        setTimeout(processNextItem, 5000);
       }
     } catch (error) {
       console.error('Error in background sync:', error);

@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-react";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { useShareIntent } from "expo-share-intent";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ProcessingStatus } from "@/components/processing-status";
@@ -439,7 +439,7 @@ export default function HomeScreen() {
             styles.uploadButtonWrapper,
             status === "uploading" && styles.uploadButtonDisabled,
           ]}
-          onPress={() => { void pickDocument(); }}
+          onPress={pickDocument}
           disabled={status === "uploading"}
         >
           <View style={styles.uploadButtonGradient}></View>
@@ -455,7 +455,7 @@ export default function HomeScreen() {
             styles.uploadButtonWrapper,
             status === "uploading" && styles.uploadButtonDisabled,
           ]}
-          onPress={() => { void pickPhotos(); }}
+          onPress={pickPhotos}
           disabled={status === "uploading"}
         >
           <View style={styles.uploadButtonGradient}></View>
@@ -479,7 +479,7 @@ export default function HomeScreen() {
             styles.magicDiagramButton, // New style for distinction
             status === "uploading" && styles.uploadButtonDisabled,
           ]}
-          onPress={() => { void takeMagicDiagramPhoto(); }}
+          onPress={takeMagicDiagramPhoto}
           disabled={status === "uploading"}
         >
           <View style={styles.uploadButtonGradient}></View>

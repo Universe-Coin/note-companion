@@ -9,14 +9,15 @@ import {
   Platform,
   ScrollView,
   Alert,
-  Linking,
 } from 'react-native';
-import { useOAuth, useSignIn } from '@clerk/clerk-expo';
+import { useOAuth } from '@clerk/clerk-expo';
+import { useSignIn } from '@clerk/clerk-react';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-WebBrowser.maybeCompleteAuthSession();
+import { GoogleGLogo } from '@/components/google-g-logo';
+import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
+import { activateClerkSession } from '@/utils/auth-session';
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -54,17 +55,8 @@ export default function SignInScreen() {
       
       if (result.status === 'complete') {
         console.log('[SignIn] Sign in complete, activating session');
-        
-        if (!setSignInActive) {
-           console.error('[SignIn] setSignInActive is unavailable');
-           Alert.alert('Error', 'Could not activate session. Please try again.');
-           setLoading(false);
-           return;
-        }
-        await setSignInActive({ session: result.createdSessionId });
-        console.log('[SignIn] Session activated successfully');
-        
-        router.replace('/(tabs)');
+        await activateClerkSession(setSignInActive, result.createdSessionId);
+        console.log('[SignIn] Session activated — auth layout will redirect');
       } else {
         console.log('[SignIn] Sign in requires additional steps:', result.status);
         // Handle additional verification if needed
@@ -91,17 +83,16 @@ export default function SignInScreen() {
     try {
       console.log('[SignIn] Starting Google OAuth flow');
       setLoading(true);
-      
-      const { createdSessionId, setActive } = await googleAuth();
+
+      prepareOAuthBrowserSession();
+      await WebBrowser.warmUpAsync();
+      const redirectUrl = getOAuthRedirectUrl();
+      const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
       
       if (createdSessionId) {
         console.log('[SignIn] Google OAuth successful, activating session');
-        // Ensure session is properly activated and persisted
-        await setActive?.({ session: createdSessionId });
-        console.log('[SignIn] Google session activated successfully');
-        
-        // Use replace instead of push to avoid back navigation to login
-        router.replace('/(tabs)');
+        await activateClerkSession(setActive, createdSessionId);
+        console.log('[SignIn] Google session activated');
       } else {
         console.log('[SignIn] Google OAuth completed but no session created');
       }
@@ -117,17 +108,16 @@ export default function SignInScreen() {
     try {
       console.log('[SignIn] Starting Apple OAuth flow');
       setLoading(true);
-      
-      const { createdSessionId, setActive } = await appleAuth();
+
+      prepareOAuthBrowserSession();
+      await WebBrowser.warmUpAsync();
+      const redirectUrl = getOAuthRedirectUrl();
+      const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
       
       if (createdSessionId) {
         console.log('[SignIn] Apple OAuth successful, activating session');
-        // Ensure session is properly activated and persisted
-        await setActive?.({ session: createdSessionId });
-        console.log('[SignIn] Apple session activated successfully');
-        
-        // Use replace instead of push to avoid back navigation to login
-        router.replace('/(tabs)');
+        await activateClerkSession(setActive, createdSessionId);
+        console.log('[SignIn] Apple session activated');
       } else {
         console.log('[SignIn] Apple OAuth completed but no session created');
       }
@@ -174,10 +164,13 @@ export default function SignInScreen() {
             onChangeText={setPassword}
             secureTextEntry
             autoComplete="password"
+            returnKeyType="go"
+            onSubmitEditing={onSignInWithEmail}
+            blurOnSubmit={false}
           />
           <TouchableOpacity
             style={[styles.button, styles.emailButton]}
-            onPress={() => { void onSignInWithEmail(); }}
+            onPress={onSignInWithEmail}
             disabled={loading}
           >
             <Text style={styles.emailButtonText}>
@@ -195,15 +188,15 @@ export default function SignInScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.googleButton]}
-            onPress={() => { void onSignInWithGoogle(); }}
+            onPress={onSignInWithGoogle}
           >
-            <Ionicons name="logo-google" size={24} color="#EA4335" />
+            <GoogleGLogo size={24} />
             <Text style={styles.buttonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.appleButton]}
-            onPress={() => { void onSignInWithApple(); }}
+            onPress={onSignInWithApple}
           >
             <Ionicons name="logo-apple" size={24} color="#000000" />
             <Text style={styles.buttonText}>

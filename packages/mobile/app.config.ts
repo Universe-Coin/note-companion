@@ -4,6 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Note Companion AI",
   slug: "note-companion",
+  owner: "jpfong",
   scheme: "notecompanion",
   version: "1.0.0",
   orientation: "portrait",
@@ -22,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.notecompanion.app",
+    bundleIdentifier: "ai.notecompanion.app",
     privacyManifests: {
       NSPrivacyAccessedAPITypes: [
         {
@@ -74,7 +75,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     icon: "./assets/big-logo.png",
-    package: "com.notecompanion.app",
+    package: "ai.notecompanion.app",
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
@@ -123,6 +124,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: [
     "expo-apple-authentication",
     "expo-router",
+    "expo-font",
+    "expo-localization",
+    "expo-web-browser",
     "expo-secure-store",
     "expo-file-system",
     "expo-asset",
@@ -160,7 +164,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       origin: false,
     },
     eas: {
-      projectId: "c9b885bf-2dc7-4e11-9db2-2bde79a19ed1",
+      projectId: "b9d83b7e-03c0-46b9-82af-cf9ac6e40235",
     },
   },
 });

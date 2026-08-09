@@ -2,16 +2,13 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "types": ["react", "react-native", "nativewind/types"],
+    "types": ["nativewind/types"],
     "incremental": true,
     "strict": true,
     "baseUrl": ".",
-
-    "typeRoots": ["./node_modules/@types"],
-
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "tailwind.config.ts"]
 }

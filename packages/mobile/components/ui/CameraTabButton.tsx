@@ -50,7 +50,7 @@ const CameraTabButton: React.FC<CameraTabButtonProps> = ({
   return (
     <TouchableOpacity
       style={[styles.container, { backgroundColor }]}
-      onPress={() => { void handlePress(); }}
+      onPress={handlePress}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       accessibilityState={accessibilityState}

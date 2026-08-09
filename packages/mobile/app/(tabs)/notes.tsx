@@ -13,13 +13,13 @@ import {
 import { useRouter, useFocusEffect } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { fetchFiles, UploadedFile } from "@/utils/api";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-react";
 import { FileList } from "@/components/FileList";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSemanticColor } from "@/hooks/useThemeColor";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as DocumentPicker from "expo-document-picker";
 import { Asset } from "expo-asset";
 
@@ -83,14 +83,14 @@ export default function NotesScreen() {
       (f) => f.processingStatus === "pending" || f.processingStatus === "processing"
     );
 
-    let id: ReturnType<typeof window.setInterval> | null = null;
+    let id: ReturnType<typeof setInterval> | null = null;
     if (stillProcessing) {
-      id = window.setInterval(() => {
+      id = setInterval(() => {
         console.log("auto-refreshing notes list…");
         loadFiles(false);                        // silent refresh
       }, 5000);
     }
-    return () => { if (id) window.clearInterval(id); };
+    return () => { if (id) clearInterval(id); };
   }, [files, loading, loadFiles]);
 
   const handleRefresh = useCallback(() => {
@@ -156,7 +156,7 @@ export default function NotesScreen() {
         <ThemedText style={styles.errorText}>{error}</ThemedText>
         <TouchableOpacity
           style={styles.retryButton}
-          onPress={() => { void loadFiles(); }}
+          onPress={() => loadFiles()}
         >
           <Text style={styles.retryButtonText}>Retry</Text>
         </TouchableOpacity>
@@ -174,7 +174,7 @@ export default function NotesScreen() {
           files={files}
           onRefresh={handleRefresh}
           refreshing={refreshing}
-          onFileDeleted={() => { void loadFiles(false); }}
+          onFileDeleted={() => loadFiles(false)}
         />
       )}
     </ThemedView>
