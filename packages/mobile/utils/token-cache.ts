@@ -6,6 +6,22 @@ type TokenCache = {
   clearToken?: (key: string) => Promise<void>;
 };
 
+function createMemoryTokenCache(): TokenCache {
+  const tokens = new Map<string, string>();
+
+  return {
+    async getToken(key) {
+      return tokens.get(key) ?? null;
+    },
+    async saveToken(key, value) {
+      tokens.set(key, value);
+    },
+    async clearToken(key) {
+      tokens.delete(key);
+    },
+  };
+}
+
 let secureStoreCache: TokenCache | null = null;
 
 async function getSecureStoreCache(): Promise<TokenCache> {
@@ -18,10 +34,14 @@ async function getSecureStoreCache(): Promise<TokenCache> {
   return secureStoreCache;
 }
 
-/** Encrypted SecureStore persistence on native; unavailable on web. */
+/** iOS: in-memory only (expo-secure-store TurboModule hangs on iOS 26). Android: SecureStore. Web: undefined. */
 export function getClerkTokenCache(): TokenCache | undefined {
   if (Platform.OS === "web") {
     return undefined;
+  }
+
+  if (Platform.OS === "ios") {
+    return createMemoryTokenCache();
   }
 
   return {

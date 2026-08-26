@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+const SPLASH_FORCE_HIDE_MS = 2_500;
 const AUTH_LOAD_TIMEOUT_MS = 12_000;
 const FONT_LOAD_TIMEOUT_MS = 5_000;
 
@@ -17,8 +18,8 @@ type StartupGateProps = {
 };
 
 /**
- * Keeps the native splash visible until fonts and Clerk are ready, then hides it.
- * Shows a spinner or timeout message instead of a blank screen.
+ * Hides the native splash within ~2.5s, then shows loading UI until fonts and Clerk are ready.
+ * Never returns null so the app is not stuck on the native splash if JS hangs.
  */
 export function StartupGate({ fontsLoaded, children }: StartupGateProps) {
   const { isLoaded: authLoaded } = useAuth();
@@ -31,6 +32,13 @@ export function StartupGate({ fontsLoaded, children }: StartupGateProps) {
 
   useEffect(() => {
     SplashScreen.preventAutoHideAsync().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync().catch(() => {});
+    }, SPLASH_FORCE_HIDE_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -50,11 +58,7 @@ export function StartupGate({ fontsLoaded, children }: StartupGateProps) {
     }
   }, [appReady]);
 
-  if (!fontsReady) {
-    return null;
-  }
-
-  if (!authReady) {
+  if (!appReady) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#8a65ed" />

@@ -33,10 +33,10 @@
   "expo": {
     "autolinking": {
       "ios": {
-        "exclude": ["@clerk/expo"]
+        "exclude": ["@clerk/expo", "expo-secure-store"]
       },
       "apple": {
-        "exclude": ["@clerk/expo"]
+        "exclude": ["@clerk/expo", "expo-secure-store"]
       }
     },
     "doctor": {
