@@ -18,7 +18,12 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "corepack": true,
+      "pnpm": "10.8.1",
+      "env": {
+        "EXPO_USE_PNPM": "1"
+      }
     }
   },
   "submit": {

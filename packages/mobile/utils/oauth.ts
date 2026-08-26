@@ -1,7 +1,7 @@
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
-/** Must match Clerk expo-auth-session default path (see @clerk/clerk-expo useOAuth). */
+/** Must match Clerk expo-auth-session default path (see @clerk/expo useOAuth). */
 export const OAUTH_REDIRECT_PATH = "oauth-native-callback";
 
 export function getOAuthRedirectUrl(): string {

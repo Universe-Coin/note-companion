@@ -10,19 +10,19 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useOAuth } from '@clerk/clerk-expo';
-import { useSignUp } from '@clerk/clerk-react';
+import { useOAuth } from '@clerk/expo';
+import { useSignUp } from '@clerk/react/legacy';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GoogleGLogo } from '@/components/google-g-logo';
 import { Link } from 'expo-router';
 import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
-import { activateClerkSession } from '@/utils/auth-session';
+import { navigateToSessionHandoff } from '@/utils/auth-session';
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { signUp, setActive: setSignUpActive, isLoaded } = useSignUp();
+  const { signUp, isLoaded } = useSignUp();
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
   const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
 
@@ -59,8 +59,8 @@ export default function SignUpScreen() {
         password,
       });
 
-      if (result.status === 'complete') {
-        await activateClerkSession(setSignUpActive, result.createdSessionId);
+      if (result.status === 'complete' && result.createdSessionId) {
+        navigateToSessionHandoff(router, result.createdSessionId);
       } else {
         // Handle additional verification if needed
         console.log(JSON.stringify(result, null, 2));
@@ -79,7 +79,7 @@ export default function SignUpScreen() {
       const redirectUrl = getOAuthRedirectUrl();
       const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
       if (createdSessionId) {
-        await activateClerkSession(setActive, createdSessionId);
+        navigateToSessionHandoff(router, createdSessionId);
       }
     } catch (err) {
       console.error('OAuth error:', err);
@@ -93,7 +93,7 @@ export default function SignUpScreen() {
       const redirectUrl = getOAuthRedirectUrl();
       const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
       if (createdSessionId) {
-        await activateClerkSession(setActive, createdSessionId);
+        navigateToSessionHandoff(router, createdSessionId);
       }
     } catch (err) {
       console.error('OAuth error:', err);

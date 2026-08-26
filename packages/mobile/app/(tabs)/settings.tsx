@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, Platform, ScrollView, Linking, TouchableOpacity } from 'react-native';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/react';
 import { Button } from '../../components/Button';
 import { ThemedView } from '../../components/ThemedView';
 import { ThemedText } from '../../components/ThemedText';

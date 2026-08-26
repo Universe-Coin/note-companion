@@ -1,49 +1,11 @@
-import { ClerkProvider as ClerkProviderExpo } from "@clerk/clerk-expo";
-import { ClerkProvider as ClerkProviderWeb } from "@clerk/clerk-react";
-import * as SecureStore from "expo-secure-store";
+import { ClerkProvider } from "@clerk/expo";
 import Constants from "expo-constants";
 import { Platform, Text, View } from "react-native";
+import { getClerkTokenCache } from "@/utils/token-cache";
 
-/** iOS 26+ requires an explicit keychain service or SecureStore can throw a native exception. */
-const SECURE_STORE_OPTIONS: SecureStore.SecureStoreOptions = {
-  keychainService: "ai.notecompanion.app",
-  keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-};
-
-// Enhanced token cache with longer expiration and error logging
-const tokenCache = {
-  async getToken(key: string) {
-    try {
-      console.log(`[TokenCache] Retrieving token for key: ${key}`);
-      const token = await SecureStore.getItemAsync(key, SECURE_STORE_OPTIONS);
-      console.log(`[TokenCache] Token ${token ? 'found' : 'not found'} for key: ${key}`);
-      return token;
-    } catch (err) {
-      console.error(`[TokenCache] Error retrieving token for key ${key}:`, err);
-      return null;
-    }
-  },
-  async saveToken(key: string, value: string) {
-    try {
-      console.log(`[TokenCache] Saving token for key: ${key}`);
-      return SecureStore.setItemAsync(key, value, SECURE_STORE_OPTIONS);
-    } catch (err) {
-      console.error(`[TokenCache] Error saving token for key ${key}:`, err);
-      return;
-    }
-  },
-  async clearToken(key: string) {
-    try {
-      await SecureStore.deleteItemAsync(key, SECURE_STORE_OPTIONS);
-    } catch (err) {
-      console.error(`[TokenCache] Error clearing token for key ${key}:`, err);
-    }
-  },
-};
+const tokenCache = getClerkTokenCache();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Prefer env: Metro inlines EXPO_PUBLIC_* into the JS bundle (reliable on web).
-  // `extra` from app.config is fine on native but can be missing or stale in some dev paths.
   const publishableKey = (
     process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ??
     (Constants.expoConfig?.extra?.clerkPublishableKey as string | undefined)
@@ -81,20 +43,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Expo web: @clerk/clerk-expo's headless client forces _is_native=1 + credentials:"omit" on every
-  // request (singleton.js), which breaks browser fetches to Clerk (Failed to fetch / CORS symptoms).
-  // Native keeps SecureStore-backed token cache via ClerkProviderExpo.
   if (Platform.OS === "web") {
     return (
-      <ClerkProviderWeb publishableKey={publishableKey}>
-        {children}
-      </ClerkProviderWeb>
+      <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
     );
   }
 
   return (
-    <ClerkProviderExpo publishableKey={publishableKey} tokenCache={tokenCache}>
+    <ClerkProvider
+      publishableKey={publishableKey}
+      tokenCache={tokenCache}
+      // Native ClerkExpo module is excluded from iOS autolinking (SPM/static frameworks).
+      __experimental_disableNativeClientSync
+    >
       {children}
-    </ClerkProviderExpo>
+    </ClerkProvider>
   );
-} 
+}

@@ -1,0 +1,56 @@
+# EAS upload ignore (replaces .gitignore when present — keep both in sync).
+
+# --- from .gitignore ---
+.vscode/
+*.iml
+.idea/
+/dist/
+node_modules/
+.pnpm-store/
+package-lock.json
+main.js
+*.map
+data.json
+.DS_Store
+/styles.css
+.turbo/
+**/.turbo/
+.vercel
+.env*.local
+**/.envback
+/android/
+/ios/
+packages/mobile/ios/
+packages/mobile/android/
+**/ios/
+**/android/
+*.ipa
+*.apk
+*.aab
+build-*.ipa
+build-*.apk
+*REPORT*.md
+*REPORT*.MD
+*REPORT*.txt
+*REPORT*.TXT
+*SUMMARY*.md
+*SUMMARY*.MD
+.env.production
+
+# --- not needed for mobile EAS build (also avoids iCloud-stalled reads) ---
+/docs/
+/memory/
+/tutorials/
+/.claude/
+/.cursor/
+**/*.gif
+
+# Other monorepo packages — mobile does not need their assets (keeps package.json for pnpm)
+/packages/landing/public/
+/packages/landing/app/
+/packages/landing/components/
+/packages/web/public/
+/packages/web/app/
+/packages/web/components/
+/packages/web/drizzle/
+/packages/audio-server/

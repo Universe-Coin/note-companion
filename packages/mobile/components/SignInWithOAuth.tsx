@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, View, StyleSheet } from "react-native";
-import { useOAuth } from "@clerk/clerk-expo";
+import { useOAuth } from "@clerk/expo";
 import * as WebBrowser from "expo-web-browser";
 import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from "@/utils/oauth";
 

@@ -13,7 +13,7 @@ import {
 import { useRouter, useFocusEffect } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { fetchFiles, UploadedFile } from "@/utils/api";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/react";
 import { FileList } from "@/components/FileList";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";

@@ -1,0 +1,34 @@
+diff --git a/ios/ClerkExpo.podspec b/ios/ClerkExpo.podspec
+index d4a27e931063de79ad692faa794810d8ac546448..0b14d3ee2999388443025c0b7bf1f49761800ab0 100644
+--- a/ios/ClerkExpo.podspec
++++ b/ios/ClerkExpo.podspec
+@@ -40,27 +40,8 @@ Pod::Spec.new do |s|
+     'SWIFT_COMPILATION_MODE' => 'wholemodule'
+   }
+ 
+-  if defined?(spm_dependency)
+-    spm_dependency(
+-      s,
+-      url: clerk_ios_repo,
+-      requirement: { :kind => 'exactVersion', :version => clerk_ios_version },
+-      products: ['ClerkKit', 'ClerkKitUI']
+-    )
+-  else
+-    raise 'ClerkExpo requires React Native 0.75 or newer for iOS Swift Package Manager dependencies.'
+-  end
+-
+-  s.source_files = "ClerkNativeBridge.swift",
+-                   "ClerkExpoModule.swift",
+-                   "ClerkNativeViewHost.swift",
+-                   "ClerkAuthNativeView.swift",
+-                   "ClerkUserProfileNativeView.swift",
+-                   "ClerkUserButtonNativeView.swift"
+-
+-  s.test_spec 'Tests' do |test_spec|
+-    test_spec.source_files = 'Tests/**/*.swift'
+-  end
++  # Note Companion: JS-only Clerk auth — skip ClerkKit SPM (breaks pod install).
++  s.source_files = []
+ 
+   install_modules_dependencies(s)
+ end

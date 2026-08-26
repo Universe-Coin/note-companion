@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/react";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
-import { useShareIntent } from "expo-share-intent";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ProcessingStatus } from "@/components/processing-status";
 import {
@@ -37,78 +36,8 @@ export default function HomeScreen() {
     sharedFile?: string;
     capturedPhoto?: string;
   }>();
-  const { shareIntent } = useShareIntent();
   const primaryColor = useSemanticColor("primary");
   const insets = useSafeAreaInsets();
-
-  useEffect(() => {
-    // Handle shared content
-    const handleSharedContent = async () => {
-      if (shareIntent) {
-        try {
-          if (shareIntent.files && shareIntent.files.length > 0) {
-            // Handle shared files
-            const file = shareIntent.files[0];
-
-            // Improved mime type detection for images
-            let mimeType = file.mimeType;
-            const fileExt = file.path.split(".").pop()?.toLowerCase();
-
-            // Fix missing or incorrect mime types from device
-            if (fileExt && (!mimeType || !mimeType.startsWith("image/"))) {
-              if (["jpg", "jpeg"].includes(fileExt)) {
-                mimeType = "image/jpeg";
-              } else if (fileExt === "png") {
-                mimeType = "image/png";
-              } else if (fileExt === "heic") {
-                mimeType = "image/heic";
-              } else if (fileExt === "webp") {
-                mimeType = "image/webp";
-              } else if (fileExt === "gif") {
-                mimeType = "image/gif";
-              }
-            }
-
-            console.log(
-              `ShareIntent: Processing file with path=${file.path}, mimeType=${mimeType}, fileName=${file.fileName}`
-            );
-
-            await uploadFiles([
-              {
-                uri: file.path,
-                mimeType: mimeType,
-                name: file.fileName,
-              },
-            ]);
-          } else if (shareIntent.text) {
-            // Handle shared text (could save as markdown or process differently)
-            const textFile = {
-              uri: `${FileSystem.cacheDirectory}shared-text-${Date.now()}.md`,
-              mimeType: "text/markdown",
-              name: "shared-text.md",
-              text: shareIntent.text,
-            };
-
-            await uploadFiles([textFile]);
-          }
-        } catch (error) {
-          console.error("Error handling shared content:", error);
-          setUploadResults([
-            {
-              status: "error",
-              error:
-                error instanceof Error
-                  ? error.message
-                  : "Failed to process shared content",
-            },
-          ]);
-          setStatus("error");
-        }
-      }
-    };
-
-    handleSharedContent();
-  }, [shareIntent]);
 
   useEffect(() => {
     // Handle shared file if present

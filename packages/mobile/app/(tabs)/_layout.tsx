@@ -1,9 +1,7 @@
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '@clerk/clerk-react';
-import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { Platform, StyleSheet, Animated } from 'react-native';
+import { useAuth } from '@clerk/react';
+import { Platform, StyleSheet, Animated, View, ActivityIndicator } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSemanticColor } from '@/hooks/useThemeColor';
 import { HapticTab } from '@/components/HapticTab';
@@ -23,7 +21,6 @@ type MaterialIconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 export default function TabLayout() {
   const { isSignedIn, isLoaded } = useAuth();
-  const router = useRouter();
   const theme = useColorScheme() ?? 'light';
   const insets = useSafeAreaInsets();
   
@@ -33,27 +30,12 @@ export default function TabLayout() {
   const backgroundColor = useSemanticColor('background');
   const tabBarColor = useSemanticColor('tabBar');
   
-  // Authentication redirect logic
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      // Give auth a moment to restore from storage before redirecting
-      const authTimeout = setTimeout(() => {
-        router.replace('/(auth)'); // Redirect to auth index instead of sign-in directly
-      }, 1000); // Wait 1 second before redirecting to allow token restore
-      
-      return () => clearTimeout(authTimeout);
-    }
-  }, [isLoaded, isSignedIn]);
-
-  // Show nothing while auth is loading to prevent flash
-  if (!isLoaded) {
-    return null;
-  }
-  
-  // If not signed in, we'll be redirected by the useEffect, but still render
-  // to prevent flashing during the delay
-  if (!isSignedIn) {
-    return null;
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={primaryColor} />
+      </View>
+    );
   }
 
   // Determine header style based on platform
@@ -171,3 +153,12 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
+});

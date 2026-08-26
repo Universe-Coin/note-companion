@@ -11,16 +11,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/big-logo.png",
   userInterfaceStyle: "automatic",
   assetBundlePatterns: ["**/*"],
-  splash: {
-    image: "./assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#ffffff",
-    dark: {
-      image: "./assets/splash-white.png",
-      resizeMode: "contain",
-      backgroundColor: "#000000",
-    },
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: "ai.notecompanion.app",
@@ -76,16 +66,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     icon: "./assets/big-logo.png",
     package: "ai.notecompanion.app",
-    splash: {
-      image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff",
-      dark: {
-        image: "./assets/splash.png",
-        resizeMode: "contain",
-        backgroundColor: "#000000",
-      },
-    },
     intentFilters: [
       {
         action: "android.intent.action.SEND",
@@ -127,10 +107,21 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-font",
     "expo-localization",
     "expo-web-browser",
-    "expo-secure-store",
     "expo-file-system",
     "expo-asset",
-    "expo-share-intent",
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/splash.png",
+        resizeMode: "contain",
+        backgroundColor: "#ffffff",
+        dark: {
+          image: "./assets/splash-white.png",
+          resizeMode: "contain",
+          backgroundColor: "#000000",
+        },
+      },
+    ],
     [
       "expo-document-picker",
       {
@@ -144,16 +135,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           usesCleartextTraffic: true,
         },
         ios: {
-          useFrameworks: "static",
+          deploymentTarget: "17.0",
           syncPlugins: false,
         },
-      },
-    ],
-    [
-      "expo-notifications",
-      {
-        icon: "./assets/big-logo.png",
-        color: "#ffffff",
       },
     ],
   ],

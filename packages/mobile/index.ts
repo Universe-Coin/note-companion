@@ -1,3 +1,6 @@
-// Do not import react-native-gesture-handler here: it must run *after* `@expo/metro-runtime`,
-// which is the first import inside `expo-router/entry` (see expo-router/entry-classic.js).
-import "expo-router/entry";
+// `@expo/metro-runtime` must stay first (Fast Refresh on web).
+import "@expo/metro-runtime";
+import { App } from "expo-router/build/qualified-entry";
+import { renderRootComponent } from "expo-router/build/renderRootComponent";
+
+renderRootComponent(App);

@@ -10,18 +10,18 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useOAuth } from '@clerk/clerk-expo';
-import { useSignIn } from '@clerk/clerk-react';
+import { useOAuth } from '@clerk/expo';
+import { useSignIn } from '@clerk/react/legacy';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GoogleGLogo } from '@/components/google-g-logo';
 import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
-import { activateClerkSession } from '@/utils/auth-session';
+import { navigateToSessionHandoff } from '@/utils/auth-session';
 
 export default function SignInScreen() {
   const router = useRouter();
-  const { signIn, setActive: setSignInActive, isLoaded } = useSignIn();
+  const { signIn, isLoaded } = useSignIn();
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
   const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
 
@@ -53,10 +53,10 @@ export default function SignInScreen() {
 
       console.log('[SignIn] Sign in result status:', result.status);
       
-      if (result.status === 'complete') {
-        console.log('[SignIn] Sign in complete, activating session');
-        await activateClerkSession(setSignInActive, result.createdSessionId);
-        console.log('[SignIn] Session activated — auth layout will redirect');
+      if (result.status === 'complete' && result.createdSessionId) {
+        console.log('[SignIn] Sign in complete, handing off session activation');
+        navigateToSessionHandoff(router, result.createdSessionId);
+        return;
       } else {
         console.log('[SignIn] Sign in requires additional steps:', result.status);
         // Handle additional verification if needed
@@ -90,9 +90,8 @@ export default function SignInScreen() {
       const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
       
       if (createdSessionId) {
-        console.log('[SignIn] Google OAuth successful, activating session');
-        await activateClerkSession(setActive, createdSessionId);
-        console.log('[SignIn] Google session activated');
+        console.log('[SignIn] Google OAuth successful, handing off');
+        navigateToSessionHandoff(router, createdSessionId);
       } else {
         console.log('[SignIn] Google OAuth completed but no session created');
       }
@@ -115,9 +114,8 @@ export default function SignInScreen() {
       const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
       
       if (createdSessionId) {
-        console.log('[SignIn] Apple OAuth successful, activating session');
-        await activateClerkSession(setActive, createdSessionId);
-        console.log('[SignIn] Apple session activated');
+        console.log('[SignIn] Apple OAuth successful, handing off');
+        navigateToSessionHandoff(router, createdSessionId);
       } else {
         console.log('[SignIn] Apple OAuth completed but no session created');
       }
@@ -166,7 +164,7 @@ export default function SignInScreen() {
             autoComplete="password"
             returnKeyType="go"
             onSubmitEditing={onSignInWithEmail}
-            blurOnSubmit={false}
+            blurOnSubmit
           />
           <TouchableOpacity
             style={[styles.button, styles.emailButton]}

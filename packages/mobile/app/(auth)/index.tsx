@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,9 +9,9 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { useRouter, Redirect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -24,9 +24,15 @@ export default function IndexScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   
-  // If already signed in, redirect to main app
+  // Same-session edge case: memory token cache keeps user signed in.
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace('/(tabs)');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
   if (isLoaded && isSignedIn) {
-    return <Redirect href="/(tabs)" />;
+    return null;
   }
   
   const features = [

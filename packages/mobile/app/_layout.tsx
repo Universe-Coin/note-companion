@@ -1,21 +1,20 @@
+import 'react-native-gesture-handler';
+import '../global.css';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, useRouter, useRootNavigationState, type Href } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
+import { useRouter, useRootNavigationState, type Href } from 'expo-router';
+import { RootNavigator } from '@/components/root-navigator';
+import { StartupGate } from '@/components/startup-gate';
+import { AuthProvider } from '@/providers/auth';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useRef } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform, ActivityIndicator, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import { processSharedFile, cleanupSharedFile } from '@/utils/share-handler';
 import { isOAuthCallbackUrl } from '@/utils/oauth';
 import * as FileSystem from 'expo-file-system/legacy';
-
-// Remove direct ClerkProvider import and use our custom AuthProvider
-import { AuthProvider } from '@/providers/auth';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
 
 /**
  * Expo web forwards normal document + in-app URLs through Linking (/, /sign-in, …).
@@ -56,12 +55,6 @@ export default function RootLayout() {
     pathname: string;
     params?: Record<string, unknown>;
   } | null>(null);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
 
   useEffect(() => {
     if (!navigationReady || !pendingNavRef.current) return;
@@ -306,29 +299,13 @@ export default function RootLayout() {
     return () => sub.remove();
   }, [navigationReady]);
 
-  if (!loaded) {
-    return null;
-  }
-
   return (
-    <View style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
-        <SafeAreaProvider>
+        <StartupGate fontsLoaded={loaded}>
+          <SafeAreaProvider>
           <ThemeProvider value={DefaultTheme}>
-            <Stack
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: '#f5f5f5',
-                },
-                headerTintColor: '#000',
-                headerTitleStyle: {
-                  fontWeight: '600',
-                },
-              }}
-            >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack>
+            <RootNavigator />
             {isProcessingShare ? (
               <View
                 pointerEvents="auto"
@@ -346,8 +323,9 @@ export default function RootLayout() {
             ) : null}
             <StatusBar style="dark" />
           </ThemeProvider>
-        </SafeAreaProvider>
+          </SafeAreaProvider>
+        </StartupGate>
       </AuthProvider>
-    </View>
+    </GestureHandlerRootView>
   );
 }
