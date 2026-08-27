@@ -115,7 +115,17 @@ function tryForceModule(moduleName) {
 }
 
 const previousResolveRequest = config.resolver.resolveRequest;
+const secureStoreShim = path.join(mobileRoot, "shims/expo-secure-store.js");
+
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (
+    platform === "ios" &&
+    (moduleName === "expo-secure-store" ||
+      moduleName.startsWith("expo-secure-store/"))
+  ) {
+    return { type: "sourceFile", filePath: secureStoreShim };
+  }
+
   const forcedClerk = tryForceClerk(moduleName);
   if (forcedClerk) {
     return forcedClerk;

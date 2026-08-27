@@ -5,16 +5,14 @@ import { useFonts } from 'expo-font';
 import { useRouter, useRootNavigationState, type Href } from 'expo-router';
 import { RootNavigator } from '@/components/root-navigator';
 import { StartupGate } from '@/components/startup-gate';
-import { AuthProvider } from '@/providers/auth';
+import { LazyAuthProvider } from '@/providers/lazy-auth-provider';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useRef } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform, ActivityIndicator, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
-import { processSharedFile, cleanupSharedFile } from '@/utils/share-handler';
 import { isOAuthCallbackUrl } from '@/utils/oauth';
-import * as FileSystem from 'expo-file-system/legacy';
 
 /**
  * Expo web forwards normal document + in-app URLs through Linking (/, /sign-in, …).
@@ -91,6 +89,11 @@ export default function RootLayout() {
     if (isOAuthCallbackUrl(url)) {
       return;
     }
+
+    const [{ processSharedFile, cleanupSharedFile }, FileSystem] = await Promise.all([
+      import('@/utils/share-handler'),
+      import('expo-file-system/legacy'),
+    ]);
 
     // Set share processing state to show loading indicator instead of not-found
     setIsProcessingShare(true);
@@ -301,7 +304,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
+      <LazyAuthProvider>
         <StartupGate fontsLoaded={loaded}>
           <SafeAreaProvider>
           <ThemeProvider value={DefaultTheme}>
@@ -325,7 +328,7 @@ export default function RootLayout() {
           </ThemeProvider>
           </SafeAreaProvider>
         </StartupGate>
-      </AuthProvider>
+      </LazyAuthProvider>
     </GestureHandlerRootView>
   );
 }

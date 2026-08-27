@@ -1,3 +1,29 @@
+diff --git a/dist/specs/NativeClerkGoogleSignIn.js b/dist/specs/NativeClerkGoogleSignIn.js
+index 3a1a75858ff8ae6b522d730bfe1d0897dd85ca67..8780611a6b4f2d3dbfedd1f9342567d1ccb493da 100644
+--- a/dist/specs/NativeClerkGoogleSignIn.js
++++ b/dist/specs/NativeClerkGoogleSignIn.js
+@@ -1,7 +1,5 @@
+-let expo = require("expo");
+-
+ //#region src/specs/NativeClerkGoogleSignIn.ts
+-var NativeClerkGoogleSignIn_default = (0, expo.requireOptionalNativeModule)("ClerkGoogleSignIn");
++var NativeClerkGoogleSignIn_default = null;
+ 
+ //#endregion
+ module.exports = NativeClerkGoogleSignIn_default;
+diff --git a/dist/specs/NativeClerkModule.js b/dist/specs/NativeClerkModule.js
+index ed833d5737b6a2d81486d1192d7604e89f8cf43c..4e7eb78ba8fafb6c9a66ac563c604fd8f043ad00 100644
+--- a/dist/specs/NativeClerkModule.js
++++ b/dist/specs/NativeClerkModule.js
+@@ -1,7 +1,5 @@
+-let expo = require("expo");
+-
+ //#region src/specs/NativeClerkModule.ts
+-var NativeClerkModule_default = (0, expo.requireOptionalNativeModule)("ClerkExpo");
++var NativeClerkModule_default = null;
+ 
+ //#endregion
+ module.exports = NativeClerkModule_default;
 diff --git a/ios/ClerkExpo.podspec b/ios/ClerkExpo.podspec
 index d4a27e931063de79ad692faa794810d8ac546448..0b14d3ee2999388443025c0b7bf1f49761800ab0 100644
 --- a/ios/ClerkExpo.podspec

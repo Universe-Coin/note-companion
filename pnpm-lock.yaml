@@ -62,7 +62,7 @@ overrides:
 
 patchedDependencies:
   '@clerk/expo@4.2.6':
-    hash: 7b2945732703093e78bb7a2c06173828b0cadbe8882c1bcd0ee13325e484ae17
+    hash: bd81aed1a998b3521984fd293941b8d94c260ddc8c8589df846102ef16f12e0c
     path: patches/@clerk__expo@4.2.6.patch
   xcode@3.0.1:
     hash: 95feb68aeb57d5445d1947580b671a26fc5c7a27a272b2bf5cd21024e8955c32
@@ -234,7 +234,7 @@ importers:
         version: 7.26.9
       '@clerk/expo':
         specifier: ^4.2.6
-        version: 4.2.6(patch_hash=7b2945732703093e78bb7a2c06173828b0cadbe8882c1bcd0ee13325e484ae17)(ca8f292f3386b17f5bfda862f4ac38c0)
+        version: 4.2.6(patch_hash=bd81aed1a998b3521984fd293941b8d94c260ddc8c8589df846102ef16f12e0c)(ca8f292f3386b17f5bfda862f4ac38c0)
       '@clerk/react':
         specifier: ^6.14.1
         version: 6.14.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -14883,7 +14883,7 @@ snapshots:
       react-dom: 19.0.1(react@19.0.1)
       tslib: 2.8.1
 
-  '@clerk/expo@4.2.6(patch_hash=7b2945732703093e78bb7a2c06173828b0cadbe8882c1bcd0ee13325e484ae17)(ca8f292f3386b17f5bfda862f4ac38c0)':
+  '@clerk/expo@4.2.6(patch_hash=bd81aed1a998b3521984fd293941b8d94c260ddc8c8589df846102ef16f12e0c)(ca8f292f3386b17f5bfda862f4ac38c0)':
     dependencies:
       '@clerk/clerk-js': 6.28.1(@solana/web3.js@1.98.4(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.9.3)(utf-8-validate@6.0.3))(@types/react@19.1.17)(bs58@6.0.0)(bufferutil@4.0.8)(react-dom@19.2.0(react@19.2.0))(react-native@0.83.10(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7)(bufferutil@4.0.8)(utf-8-validate@6.0.3))(@types/react@19.1.17)(bufferutil@4.0.8)(react@19.2.0)(utf-8-validate@6.0.3))(react@19.2.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.0))(utf-8-validate@6.0.3)(zod@3.25.76)
       '@clerk/react': 6.14.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)

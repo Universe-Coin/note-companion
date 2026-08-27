@@ -51,6 +51,38 @@ else
   echo "WARN: @clerk/expo podspec not found — run pnpm install from repo root"
 fi
 
+NATIVE_SPEC=""
+for candidate in \
+  "$ROOT/node_modules/@clerk/expo/dist/specs/NativeClerkModule.js" \
+  "$REPO_ROOT/node_modules/@clerk/expo/dist/specs/NativeClerkModule.js"; do
+  if [[ -f "$candidate" ]]; then
+    NATIVE_SPEC="$candidate"
+    break
+  fi
+done
+
+if [[ -n "$NATIVE_SPEC" ]]; then
+  if rg -q "requireOptionalNativeModule" "$NATIVE_SPEC"; then
+    echo "FAIL: NativeClerkModule.js still calls requireOptionalNativeModule (pnpm patch incomplete)"
+    exit 1
+  fi
+  echo "OK: NativeClerkModule.js stubbed (no TurboModule lookup at import)"
+else
+  echo "WARN: NativeClerkModule.js not found — run pnpm install from repo root"
+fi
+
+echo "→ Checking expo autolinking for expo-secure-store..."
+SECURE_MODULES="$(
+  node --no-warnings --eval "require('expo/bin/autolinking')" \
+    expo-modules-autolinking resolve --platform ios --json \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const j=JSON.parse(d);console.log((j.modules||[]).map(m=>m.packageName).filter(n=>n==='expo-secure-store').join(','));});"
+)"
+if [[ -n "$SECURE_MODULES" ]]; then
+  echo "FAIL: expo-secure-store is still autolinked on iOS: $SECURE_MODULES"
+  exit 1
+fi
+echo "OK: expo-secure-store excluded from iOS autolinking"
+
 if [[ "$QUICK" == "1" ]]; then
   echo ""
   echo "Quick checks passed (prebuild skipped)."
