@@ -1,7 +1,7 @@
 import { Stack, useRouter, useSegments } from "expo-router";
-import { useAuth } from "@clerk/react";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
+import { useSafeAuth } from "@/hooks/use-safe-auth";
 
 /**
  * Root stack navigator. Sign-in → tabs navigation is handled by the handoff
@@ -9,7 +9,7 @@ import { Platform } from "react-native";
  * This component only guards tabs when the user is signed out.
  */
 export function RootNavigator() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useSafeAuth();
   const router = useRouter();
   const segments = useSegments();
   const redirectingRef = useRef(false);

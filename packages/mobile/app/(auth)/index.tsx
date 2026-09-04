@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '@clerk/react';
+import { useSafeAuth } from '@/hooks/use-safe-auth';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -20,7 +20,7 @@ type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 export default function IndexScreen() {
   const router = useRouter();
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded } = useSafeAuth();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   

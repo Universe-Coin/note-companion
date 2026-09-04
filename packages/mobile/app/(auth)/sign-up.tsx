@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,22 +9,22 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { useOAuth } from '@clerk/expo';
 import { useSignUp } from '@clerk/react/legacy';
-import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { GoogleGLogo } from '@/components/google-g-logo';
 import { Link } from 'expo-router';
-import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
 import { navigateToSessionHandoff } from '@/utils/auth-session';
+
+const OAuthContinueButtons = lazy(() =>
+  import('@/components/oauth-continue-buttons').then((module) => ({
+    default: module.OAuthContinueButtons,
+  })),
+);
 
 export default function SignUpScreen() {
   const router = useRouter();
   const { signUp, isLoaded } = useSignUp();
-  const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
-  const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -71,34 +71,6 @@ export default function SignUpScreen() {
       setLoading(false);
     }
   };
-
-  const onSignUpWithGoogle = React.useCallback(async () => {
-    try {
-      prepareOAuthBrowserSession();
-      await WebBrowser.warmUpAsync();
-      const redirectUrl = getOAuthRedirectUrl();
-      const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
-      if (createdSessionId) {
-        navigateToSessionHandoff(router, createdSessionId);
-      }
-    } catch (err) {
-      console.error('OAuth error:', err);
-    }
-  }, [googleAuth]);
-
-  const onSignUpWithApple = React.useCallback(async () => {
-    try {
-      prepareOAuthBrowserSession();
-      await WebBrowser.warmUpAsync();
-      const redirectUrl = getOAuthRedirectUrl();
-      const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
-      if (createdSessionId) {
-        navigateToSessionHandoff(router, createdSessionId);
-      }
-    } catch (err) {
-      console.error('OAuth error:', err);
-    }
-  }, [appleAuth]);
 
   if (!isLoaded) {
     return null;
@@ -161,27 +133,9 @@ export default function SignUpScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.googleButton]}
-            onPress={onSignUpWithGoogle}
-          >
-            <GoogleGLogo size={24} />
-            <Text style={styles.buttonText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.appleButton]}
-            onPress={onSignUpWithApple}
-          >
-            <View style={styles.appleLogoContainer}>
-              <Ionicons name="logo-apple" size={24} color="#FFFFFF" />
-            </View>
-            <Text style={[styles.buttonText, styles.appleButtonText]}>
-              Continue with Apple
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Suspense fallback={<ActivityIndicator color="#8a65ed" />}>
+          <OAuthContinueButtons disabled={loading} appleDark />
+        </Suspense>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account? </Text>

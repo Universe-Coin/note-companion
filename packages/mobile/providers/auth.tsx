@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/expo";
 import Constants from "expo-constants";
 import { Platform, Text, View } from "react-native";
+import { AppErrorBoundary } from "@/components/app-error-boundary";
 import { getClerkTokenCache } from "@/utils/token-cache";
 
 const tokenCache = getClerkTokenCache();
@@ -45,18 +46,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   if (Platform.OS === "web") {
     return (
-      <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
+      <AppErrorBoundary>
+        <ClerkProvider publishableKey={publishableKey}>{children}</ClerkProvider>
+      </AppErrorBoundary>
     );
   }
 
   return (
-    <ClerkProvider
-      publishableKey={publishableKey}
-      tokenCache={tokenCache}
-      // Native ClerkExpo module is excluded from iOS autolinking (SPM/static frameworks).
-      __experimental_disableNativeClientSync
-    >
-      {children}
-    </ClerkProvider>
+    <AppErrorBoundary>
+      <ClerkProvider
+        publishableKey={publishableKey}
+        tokenCache={tokenCache}
+        // Native ClerkExpo module is excluded from iOS autolinking (SPM/static frameworks).
+        __experimental_disableNativeClientSync
+      >
+        {children}
+      </ClerkProvider>
+    </AppErrorBoundary>
   );
 }

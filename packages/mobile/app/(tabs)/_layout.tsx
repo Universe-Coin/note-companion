@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '@clerk/react';
+import { useSafeAuth } from '@/hooks/use-safe-auth';
 import { Platform, StyleSheet, Animated, View, ActivityIndicator } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSemanticColor } from '@/hooks/useThemeColor';
@@ -20,7 +20,7 @@ interface TabIconProps {
 type MaterialIconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 export default function TabLayout() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded } = useSafeAuth();
   const theme = useColorScheme() ?? 'light';
   const insets = useSafeAreaInsets();
   

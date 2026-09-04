@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,21 +9,21 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { useOAuth } from '@clerk/expo';
 import { useSignIn } from '@clerk/react/legacy';
-import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { GoogleGLogo } from '@/components/google-g-logo';
-import { getOAuthRedirectUrl, prepareOAuthBrowserSession } from '@/utils/oauth';
 import { navigateToSessionHandoff } from '@/utils/auth-session';
+
+const OAuthContinueButtons = lazy(() =>
+  import('@/components/oauth-continue-buttons').then((module) => ({
+    default: module.OAuthContinueButtons,
+  })),
+);
 
 export default function SignInScreen() {
   const router = useRouter();
   const { signIn, isLoaded } = useSignIn();
-  const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
-  const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -78,54 +78,6 @@ export default function SignInScreen() {
       setLoading(false);
     }
   };
-
-  const onSignInWithGoogle = React.useCallback(async () => {
-    try {
-      console.log('[SignIn] Starting Google OAuth flow');
-      setLoading(true);
-
-      prepareOAuthBrowserSession();
-      await WebBrowser.warmUpAsync();
-      const redirectUrl = getOAuthRedirectUrl();
-      const { createdSessionId, setActive } = await googleAuth({ redirectUrl });
-      
-      if (createdSessionId) {
-        console.log('[SignIn] Google OAuth successful, handing off');
-        navigateToSessionHandoff(router, createdSessionId);
-      } else {
-        console.log('[SignIn] Google OAuth completed but no session created');
-      }
-    } catch (err) {
-      console.error('[SignIn] Google OAuth error:', err);
-      Alert.alert('Error', 'Failed to sign in with Google');
-    } finally {
-      setLoading(false);
-    }
-  }, [googleAuth]);
-
-  const onSignInWithApple = React.useCallback(async () => {
-    try {
-      console.log('[SignIn] Starting Apple OAuth flow');
-      setLoading(true);
-
-      prepareOAuthBrowserSession();
-      await WebBrowser.warmUpAsync();
-      const redirectUrl = getOAuthRedirectUrl();
-      const { createdSessionId, setActive } = await appleAuth({ redirectUrl });
-      
-      if (createdSessionId) {
-        console.log('[SignIn] Apple OAuth successful, handing off');
-        navigateToSessionHandoff(router, createdSessionId);
-      } else {
-        console.log('[SignIn] Apple OAuth completed but no session created');
-      }
-    } catch (err) {
-      console.error('[SignIn] Apple OAuth error:', err);
-      Alert.alert('Error', 'Failed to sign in with Apple');
-    } finally {
-      setLoading(false);
-    }
-  }, [appleAuth]);
 
   if (!isLoaded) {
     return null;
@@ -183,25 +135,9 @@ export default function SignInScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.googleButton]}
-            onPress={onSignInWithGoogle}
-          >
-            <GoogleGLogo size={24} />
-            <Text style={styles.buttonText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.appleButton]}
-            onPress={onSignInWithApple}
-          >
-            <Ionicons name="logo-apple" size={24} color="#000000" />
-            <Text style={styles.buttonText}>
-              Continue with Apple
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Suspense fallback={<ActivityIndicator color="#8a65ed" />}>
+          <OAuthContinueButtons disabled={loading} />
+        </Suspense>
 
         <View style={styles.footer}>
           <View style={styles.footerLinks}>

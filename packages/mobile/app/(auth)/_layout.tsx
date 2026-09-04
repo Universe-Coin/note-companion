@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { useAuth } from "@clerk/react";
+import { useSafeAuth } from "@/hooks/use-safe-auth";
 import {
   ActivityIndicator,
   Platform,
@@ -10,7 +10,7 @@ import {
 import { useSemanticColor } from "@/hooks/useThemeColor";
 
 export default function AuthLayout() {
-  const { isLoaded } = useAuth();
+  const { isLoaded } = useSafeAuth();
   const primaryColor = useSemanticColor("primary");
 
   if (!isLoaded) {

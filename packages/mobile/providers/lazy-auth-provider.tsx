@@ -1,8 +1,14 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { AuthLoadFailed } from "@/components/auth-load-failed";
 
 const AuthProviderInner = lazy(() =>
-  import("./auth").then((module) => ({ default: module.AuthProvider })),
+  import("./auth")
+    .then((module) => ({ default: module.AuthProvider }))
+    .catch((error) => {
+      console.error("[Auth] Failed to load Clerk:", error);
+      return { default: AuthLoadFailed };
+    }),
 );
 
 type LazyAuthProviderProps = {
@@ -12,6 +18,7 @@ type LazyAuthProviderProps = {
 /**
  * Defers loading @clerk/expo until after the first frame so splash can hide
  * and native TurboModule init does not block the initial paint.
+ * Import failure renders AuthLoadFailed instead of an uncaught rejection.
  */
 export function LazyAuthProvider({ children }: LazyAuthProviderProps) {
   const [deferClerk, setDeferClerk] = useState(false);

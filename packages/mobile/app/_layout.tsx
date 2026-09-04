@@ -3,6 +3,7 @@ import '../global.css';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { useRouter, useRootNavigationState, type Href } from 'expo-router';
+import { AppErrorBoundary } from '@/components/app-error-boundary';
 import { RootNavigator } from '@/components/root-navigator';
 import { StartupGate } from '@/components/startup-gate';
 import { LazyAuthProvider } from '@/providers/lazy-auth-provider';
@@ -304,6 +305,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppErrorBoundary>
       <LazyAuthProvider>
         <StartupGate fontsLoaded={loaded}>
           <SafeAreaProvider>
@@ -329,6 +331,7 @@ export default function RootLayout() {
           </SafeAreaProvider>
         </StartupGate>
       </LazyAuthProvider>
+      </AppErrorBoundary>
     </GestureHandlerRootView>
   );
 }

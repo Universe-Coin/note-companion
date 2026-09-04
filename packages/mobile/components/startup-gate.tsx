@@ -1,4 +1,3 @@
-import { useAuth } from "@clerk/react";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import {
@@ -7,6 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAuth } from "@/hooks/use-safe-auth";
 
 const SPLASH_FORCE_HIDE_MS = 2_500;
 const AUTH_LOAD_TIMEOUT_MS = 12_000;
@@ -22,7 +22,7 @@ type StartupGateProps = {
  * Never returns null so the app is not stuck on the native splash if JS hangs.
  */
 export function StartupGate({ fontsLoaded, children }: StartupGateProps) {
-  const { isLoaded: authLoaded } = useAuth();
+  const { isLoaded: authLoaded } = useSafeAuth();
   const [fontTimedOut, setFontTimedOut] = useState(false);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
