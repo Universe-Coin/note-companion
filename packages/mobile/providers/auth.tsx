@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           justifyContent: "center",
           paddingHorizontal: 24,
           paddingVertical: 32,
+          backgroundColor: "#ffffff",
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 12 }}>

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {
+  ActivityIndicator,
   View,
   StyleSheet,
   Text,
@@ -32,7 +33,11 @@ export default function IndexScreen() {
   }, [isLoaded, isSignedIn, router]);
 
   if (isLoaded && isSignedIn) {
-    return null;
+    return (
+      <View style={styles.redirecting}>
+        <ActivityIndicator size="large" color="#8a65ed" />
+      </View>
+    );
   }
   
   const features = [
@@ -127,6 +132,12 @@ export default function IndexScreen() {
 }
 
 const styles = StyleSheet.create({
+  redirecting: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',

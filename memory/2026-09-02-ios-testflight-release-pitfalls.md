@@ -12,6 +12,8 @@
 | EAS submit: “waiting for an available submitter” | Expo free-tier submit queue | Wait, or upload IPA via Apple Transporter, or paid Expo plan |
 | Build succeeded but app still old behavior | TestFlight still on previous build number | Install latest build from TestFlight after processing |
 | **Build 24** dies on open (~131ms). TestFlight: “Crash directly when opening” | JS fatal (`RCTFatal` / `RCTExceptionsManager`). Same SIGABRT costume as build 6, but never reaches UI. Likely `useAuth` outside matching Clerk context, Clerk/`clerk-js` init, or invalid hook call. `.crash` has no JS message | Boot hardening in build 25+ (`useSafeAuth`, error boundary, no eager `@clerk/expo` on routes, production fatal guard). Rebuild + TestFlight to verify. Console.app still useful if it dies again |
+| Small splash square, then **black screen**, no crash, UI dead | Splash hidden while the JS tree is empty: (1) production fatal guard swallowed RCTFatal but a second `registerRootComponent` is a **no-op** on native; (2) `StartupGate` still force-hid splash on a timer; (3) Expo Router `Stack` was not mounted until Clerk loaded, so the native screen was a dark-mode black UIViewController; (4) expo-router’s `_internal_preventAutoHideAsync` hides splash on any `ErrorUtils` error. Auth `return null` / layouts with no background | Keep splash until a white surface + root `Stack` are mounted. Report fatals to already-mounted `BootShell` (do not re-register the root). `AuthReadyGate` / `LazyAuthProvider` must **overlay**, not replace, the navigator. Never `return null` on auth screens. Root `backgroundColor: #ffffff` |
+| **Could not start** / `undefined is not a function` on white | Metro `tryForceClerk` used `require.resolve("@clerk/clerk-js")`, which picks **DOM** `dist/clerk.js` (1.5MB), not `dist/clerk.native.js`. ClerkProvider then calls browser APIs. Fatal guard now surfaces this instead of a black screen | On ios/android, resolve `@clerk/clerk-js` to `dist/clerk.native.js`. Keep one physical `@clerk/react` tree. BootFailed should include the stack |
 | **Build 6, 7, 9, 10** crash ~22–33s after launch after submit. Same phone. 6+7 Aug 9 “login / pwd submit”; 9+10 Aug 11 “after submit” (iOS 26.6) | Same class: TurboModule abort on a worker after submit. 6+7 Thread 0 = `RNSScreen setViewToSnapshot`. 9+10 Thread 0 idle (9 also launching a view service). App UUID `fc516b11…` for 6–9; build 10 is `65381518…` (binary changed, React/Hermes UUIDs unchanged). Predates handoff/keyboard workarounds | `navigateToSessionHandoff` before `setActive`; do not `Keyboard.dismiss` on iOS 26. Still waiting behind the build 24 boot crash |
 
 ## Release checklist (run in order)
@@ -49,8 +51,12 @@
 - `hooks/use-safe-auth.ts` — catch `useAuth()` throw (missing/mismatched ClerkProvider) on boot layouts
 - `components/app-error-boundary.tsx` — render errors show UI instead of SIGABRT
 - `index.ts` — production `ErrorUtils` does not call `RCTFatal`; router import failure shows “Could not start”
-- `lazy-auth-provider.tsx` — Clerk import failure → `AuthLoadFailed`
-- Sign-in/sign-up no longer top-level-import `@clerk/expo` (eager clerk-js at route eval). OAuth lives in lazy `oauth-continue-buttons.tsx`
+- `boot-shell.tsx` / `lib/boot-runtime.ts` — fatals update the mounted tree (`reportBootFatal`). Do not call `renderRootComponent` twice
+- `lazy-auth-provider.tsx` — Clerk import failure → `AuthLoadFailed`; children (root `Stack`) stay mounted while Clerk loads
+- `auth-ready-gate.tsx` — overlay spinner/timeout; does not unmount the navigator
+- `startup-gate.tsx` — no timed splash hide; always mounts children
+- `metro.config.js` — native `@clerk/clerk-js` → `dist/clerk.native.js` (not DOM `clerk.js`)
+- Sign-in/sign-up no longer top-level-import `@clerk/expo` (eager clerk-js at route eval). OAuth lives in lazy `oauth-continue-buttons.tsx`. Loading state is a white spinner, never `return null`
 
 This does **not** fix builds 6+7+9+10 (login `RNSScreen` unmount / view-service abort after submit). That still needs the handoff path to be verified after boot works.
 
@@ -60,6 +66,10 @@ This does **not** fix builds 6+7+9+10 (login `RNSScreen` unmount / view-service 
 - **Do not** push EAS build after editing `package.json` without running `pnpm install` at root.
 - **Do not** assume submit CLI stuck = failed — check https://expo.dev/accounts/jpfong/projects/note-companion/submissions
 - **Do not** hide splash on font load only — wait for Clerk `isLoaded` or show explicit loading/error.
+- **Do not** swallow JS fatals and also force-hide the splash — that is a black screen with no crash. Leave the splash up, or show `BootFailed` via the already-mounted `BootShell`.
+- **Do not** call `registerRootComponent` / `renderRootComponent` a second time to recover from a fatal — native ignores it.
+- **Do not** return early from root / auth providers without the Expo Router `Stack` — an unmounted navigator is a blank native screen (black in dark mode).
+- **Do not** `require.resolve("@clerk/clerk-js")` in Metro for native — Node’s export conditions pick the browser `clerk.js`. Use `dist/clerk.native.js` on ios/android.
 - **Do not** treat every TestFlight `SIGABRT` as the same bug — compare time-to-crash and Thread 0. Builds 6+7+9+10 = post-submit (~22–33s). Build 24 = JS fatal at cold start (~131ms).
 - **Do not** expect the JS exception string in a TestFlight `.crash` — use Console.app or a redbox/dev build.
 

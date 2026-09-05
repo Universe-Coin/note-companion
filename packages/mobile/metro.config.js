@@ -60,10 +60,24 @@ const bareReactFamily = new Set([
   "scheduler",
 ]);
 
-/** One physical @clerk/* tree so ClerkProvider and useAuth share the same React context. */
-function tryForceClerk(moduleName) {
+/**
+ * One physical @clerk/* tree so ClerkProvider and useAuth share the same React context.
+ * Do NOT require.resolve("@clerk/clerk-js") on native — Node picks dist/clerk.js (DOM).
+ * That throws "undefined is not a function" as soon as ClerkProvider constructs Clerk.
+ */
+function tryForceClerk(moduleName, platform) {
   if (!moduleName.startsWith("@clerk/")) return null;
   try {
+    if (
+      moduleName === "@clerk/clerk-js" &&
+      (platform === "ios" || platform === "android")
+    ) {
+      const browserEntry = resolveFromMobile("@clerk/clerk-js");
+      return {
+        type: "sourceFile",
+        filePath: path.join(path.dirname(browserEntry), "clerk.native.js"),
+      };
+    }
     return {
       type: "sourceFile",
       filePath: resolveFromMobile(moduleName),
@@ -126,7 +140,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     return { type: "sourceFile", filePath: secureStoreShim };
   }
 
-  const forcedClerk = tryForceClerk(moduleName);
+  const forcedClerk = tryForceClerk(moduleName, platform);
   if (forcedClerk) {
     return forcedClerk;
   }

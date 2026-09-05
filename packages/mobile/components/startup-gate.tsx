@@ -1,104 +1,31 @@
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useSafeAuth } from "@/hooks/use-safe-auth";
-
-const SPLASH_FORCE_HIDE_MS = 2_500;
-const AUTH_LOAD_TIMEOUT_MS = 12_000;
-const FONT_LOAD_TIMEOUT_MS = 5_000;
+import * as SystemUI from "expo-system-ui";
+import { useEffect, type ReactNode } from "react";
+import { View } from "react-native";
+import { BOOT_BACKGROUND, bootSurfaceStyles } from "@/constants/boot-surface";
 
 type StartupGateProps = {
   fontsLoaded: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 /**
- * Hides the native splash within ~2.5s, then shows loading UI until fonts and Clerk are ready.
- * Never returns null so the app is not stuck on the native splash if JS hangs.
+ * White root surface. Always mounts children so Expo Router's Stack exists.
+ * Hides the native splash after this surface is on screen — never on a timer
+ * while the JS tree might be empty.
  */
-export function StartupGate({ fontsLoaded, children }: StartupGateProps) {
-  const { isLoaded: authLoaded } = useSafeAuth();
-  const [fontTimedOut, setFontTimedOut] = useState(false);
-  const [authTimedOut, setAuthTimedOut] = useState(false);
-
-  const fontsReady = fontsLoaded || fontTimedOut;
-  const authReady = authLoaded || authTimedOut;
-  const appReady = fontsReady && authReady;
-
+export function StartupGate({ fontsLoaded: _fontsLoaded, children }: StartupGateProps) {
   useEffect(() => {
+    SystemUI.setBackgroundColorAsync(BOOT_BACKGROUND).catch(() => {});
     SplashScreen.preventAutoHideAsync().catch(() => {});
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const frame = requestAnimationFrame(() => {
       SplashScreen.hideAsync().catch(() => {});
-    }, SPLASH_FORCE_HIDE_MS);
-    return () => clearTimeout(timer);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setFontTimedOut(true), FONT_LOAD_TIMEOUT_MS);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!fontsReady) return;
-    const timer = setTimeout(() => setAuthTimedOut(true), AUTH_LOAD_TIMEOUT_MS);
-    return () => clearTimeout(timer);
-  }, [fontsReady]);
-
-  useEffect(() => {
-    if (appReady) {
-      SplashScreen.hideAsync().catch(() => {});
-    }
-  }, [appReady]);
-
-  if (!appReady) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#8a65ed" />
-      </View>
-    );
-  }
-
-  if (authTimedOut && !authLoaded) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Could not reach sign-in</Text>
-        <Text style={styles.body}>
-          Check your internet connection and force-quit the app, then try again.
-        </Text>
-      </View>
-    );
-  }
-
-  return <>{children}</>;
+  return <View style={bootSurfaceStyles.fill}>{children}</View>;
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    textAlign: "center",
-    color: "#333",
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-    color: "#666",
-  },
-});

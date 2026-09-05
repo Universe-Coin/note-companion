@@ -1,7 +1,7 @@
 // `@expo/metro-runtime` must stay first (Fast Refresh on web).
 import "@expo/metro-runtime";
 import { createElement } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { formatBootError, reportBootFatal } from "./lib/boot-runtime";
 
 type GlobalErrorUtils = {
   getGlobalHandler?: () => (error: unknown, isFatal?: boolean) => void;
@@ -11,8 +11,10 @@ type GlobalErrorUtils = {
 };
 
 /**
- * Production TestFlight aborts on uncaught JS via RCTFatal (build 24, 131ms).
- * Keep a visible UI instead of SIGABRT. Dev still uses the default redbox.
+ * Production TestFlight aborts on uncaught JS via RCTFatal (build 24).
+ * Do not call registerRootComponent again — that is a no-op on native and
+ * leaves a dead window. BootShell already mounted listens for reportBootFatal.
+ * Dev still uses the default redbox.
  */
 function installFatalGuard() {
   const errorUtils = (globalThis as { ErrorUtils?: GlobalErrorUtils })
@@ -21,71 +23,49 @@ function installFatalGuard() {
 
   const previous = errorUtils.getGlobalHandler?.();
   errorUtils.setGlobalHandler((error, isFatal) => {
+    const message = formatBootError(error);
     console.error("[JS]", isFatal ? "fatal" : "error", error);
+
     if (__DEV__) {
       previous?.(error, isFatal);
       return;
     }
-    if (!isFatal) {
-      previous?.(error, isFatal);
+
+    if (isFatal) {
+      reportBootFatal(message);
+      return;
     }
+
+    previous?.(error, isFatal);
   });
 }
-
-function BootFailed({ message }: { message: string }) {
-  return createElement(
-    View,
-    { style: bootStyles.centered },
-    createElement(Text, { style: bootStyles.title }, "Could not start"),
-    createElement(Text, { style: bootStyles.body }, message),
-  );
-}
-
-const bootStyles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    backgroundColor: "#ffffff",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    textAlign: "center",
-    color: "#333",
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-    color: "#666",
-  },
-});
 
 installFatalGuard();
 
 void (async () => {
   const SplashScreen = await import("expo-splash-screen");
   await SplashScreen.preventAutoHideAsync().catch(() => {});
-  setTimeout(() => {
-    void SplashScreen.hideAsync().catch(() => {});
-  }, 1500);
+  // Do not force-hide here. A timed hide with a dead JS tree is a black screen.
 
   try {
     const { App } = await import("expo-router/build/qualified-entry");
     const { renderRootComponent } = await import(
       "expo-router/build/renderRootComponent"
     );
-    renderRootComponent(App);
+    const { BootShell } = await import("./components/boot-shell");
+    const Root = () => createElement(BootShell, { App });
+    renderRootComponent(Root);
+    // expo-router wraps ErrorUtils on a timeout and hides splash on any error.
+    // Re-install after that wrap so fatals update BootShell instead of a blank view.
+    setTimeout(installFatalGuard, 20);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "The app failed to load.";
+    const message = formatBootError(error);
     console.error("[Boot] expo-router failed to load:", error);
     const { renderRootComponent } = await import(
       "expo-router/build/renderRootComponent"
     );
-    renderRootComponent(() => createElement(BootFailed, { message }));
+    const { BootFailedScreen } = await import("./components/boot-shell");
+    renderRootComponent(() => createElement(BootFailedScreen, { message }));
+    await SplashScreen.hideAsync().catch(() => {});
   }
 })();

@@ -10,6 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   icon: "./assets/big-logo.png",
   userInterfaceStyle: "automatic",
+  backgroundColor: "#ffffff",
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
@@ -118,7 +119,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         dark: {
           image: "./assets/splash-white.png",
           resizeMode: "contain",
-          backgroundColor: "#000000",
+          backgroundColor: "#ffffff",
         },
       },
     ],

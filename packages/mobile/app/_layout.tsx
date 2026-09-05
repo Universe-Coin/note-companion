@@ -4,8 +4,10 @@ import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { useRouter, useRootNavigationState, type Href } from 'expo-router';
 import { AppErrorBoundary } from '@/components/app-error-boundary';
+import { AuthReadyGate } from '@/components/auth-ready-gate';
 import { RootNavigator } from '@/components/root-navigator';
 import { StartupGate } from '@/components/startup-gate';
+import { BOOT_BACKGROUND } from '@/constants/boot-surface';
 import { LazyAuthProvider } from '@/providers/lazy-auth-provider';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useRef } from 'react';
@@ -14,6 +16,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform, ActivityIndicator, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import { isOAuthCallbackUrl } from '@/utils/oauth';
+
+export const unstable_settings = {
+  initialRouteName: '(auth)',
+};
 
 /**
  * Expo web forwards normal document + in-app URLs through Linking (/, /sign-in, …).
@@ -304,10 +310,11 @@ export default function RootLayout() {
   }, [navigationReady]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: BOOT_BACKGROUND }}>
       <AppErrorBoundary>
+      <StartupGate fontsLoaded={loaded}>
       <LazyAuthProvider>
-        <StartupGate fontsLoaded={loaded}>
+        <AuthReadyGate>
           <SafeAreaProvider>
           <ThemeProvider value={DefaultTheme}>
             <RootNavigator />
@@ -329,8 +336,9 @@ export default function RootLayout() {
             <StatusBar style="dark" />
           </ThemeProvider>
           </SafeAreaProvider>
-        </StartupGate>
+        </AuthReadyGate>
       </LazyAuthProvider>
+      </StartupGate>
       </AppErrorBoundary>
     </GestureHandlerRootView>
   );

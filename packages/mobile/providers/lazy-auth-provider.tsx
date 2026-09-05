@@ -1,61 +1,50 @@
-import { Suspense, lazy, useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { View } from "react-native";
 import { AuthLoadFailed } from "@/components/auth-load-failed";
+import { bootSurfaceStyles } from "@/constants/boot-surface";
 
-const AuthProviderInner = lazy(() =>
-  import("./auth")
-    .then((module) => ({ default: module.AuthProvider }))
-    .catch((error) => {
-      console.error("[Auth] Failed to load Clerk:", error);
-      return { default: AuthLoadFailed };
-    }),
-);
+type AuthProviderComponent = ComponentType<{ children: ReactNode }>;
 
 type LazyAuthProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 /**
- * Defers loading @clerk/expo until after the first frame so splash can hide
- * and native TurboModule init does not block the initial paint.
- * Import failure renders AuthLoadFailed instead of an uncaught rejection.
+ * Loads Clerk after the first frame so native init does not block paint.
+ * Children stay mounted the whole time — Suspense/early return would unmount
+ * Expo Router's Stack and leave a blank native screen.
  */
 export function LazyAuthProvider({ children }: LazyAuthProviderProps) {
-  const [deferClerk, setDeferClerk] = useState(false);
+  const [Provider, setProvider] = useState<AuthProviderComponent | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setDeferClerk(true));
+      void import("./auth")
+        .then((module) => {
+          if (!cancelled) {
+            setProvider(() => module.AuthProvider);
+          }
+        })
+        .catch((error) => {
+          console.error("[Auth] Failed to load Clerk:", error);
+          if (!cancelled) setFailed(true);
+        });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
-  if (!deferClerk) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#8a65ed" />
-      </View>
-    );
+  if (failed) {
+    return <AuthLoadFailed />;
   }
 
-  return (
-    <Suspense
-      fallback={
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#8a65ed" />
-        </View>
-      }
-    >
-      <AuthProviderInner>{children}</AuthProviderInner>
-    </Suspense>
-  );
-}
+  if (!Provider) {
+    return <View style={bootSurfaceStyles.fill}>{children}</View>;
+  }
 
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ffffff",
-  },
-});
+  return <Provider>{children}</Provider>;
+}

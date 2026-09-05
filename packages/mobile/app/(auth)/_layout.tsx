@@ -1,26 +1,8 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { useSafeAuth } from "@/hooks/use-safe-auth";
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
-import { useSemanticColor } from "@/hooks/useThemeColor";
+import { Platform } from "react-native";
 
 export default function AuthLayout() {
-  const { isLoaded } = useSafeAuth();
-  const primaryColor = useSemanticColor("primary");
-
-  if (!isLoaded) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={primaryColor} />
-      </View>
-    );
-  }
-
   return (
     <Stack
       screenOptions={{
@@ -38,11 +20,3 @@ export default function AuthLayout() {
     </Stack>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

@@ -80,7 +80,11 @@ export default function SignInScreen() {
   };
 
   if (!isLoaded) {
-    return null;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#8a65ed" />
+      </View>
+    );
   }
 
   return (
@@ -184,6 +188,12 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

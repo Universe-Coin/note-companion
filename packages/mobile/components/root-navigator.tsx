@@ -38,6 +38,7 @@ export function RootNavigator() {
     <Stack
       screenOptions={{
         headerShown: false,
+        contentStyle: { backgroundColor: "#ffffff" },
         animation: Platform.OS === "ios" ? "none" : "fade",
       }}
       initialRouteName="(auth)"
