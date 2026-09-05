@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
+const fs = require("fs");
 const path = require("path");
 
 const mobileRoot = __dirname;
@@ -12,10 +13,41 @@ function resolveFromMobile(moduleName) {
 
 let config = getDefaultConfig(mobileRoot);
 
-const clerkScope = path.join(mobileRoot, "node_modules", "@clerk");
+function packageRootFromEntry(entryFile) {
+  let dir = path.dirname(entryFile);
+  for (let i = 0; i < 8; i++) {
+    if (fs.existsSync(path.join(dir, "package.json"))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return path.dirname(path.dirname(entryFile));
+}
+
+function resolvePackageRoot(moduleName, fallbackSegments) {
+  try {
+    return packageRootFromEntry(resolveFromMobile(moduleName));
+  } catch {
+    return path.join(mobileRoot, ...fallbackSegments);
+  }
+}
+
+const clerkJsBrowserEntry = (() => {
+  try {
+    return resolveFromMobile("@clerk/clerk-js");
+  } catch {
+    return null;
+  }
+})();
+const clerkJsNativeEntry = clerkJsBrowserEntry
+  ? path.join(path.dirname(clerkJsBrowserEntry), "clerk.native.js")
+  : null;
+
 const rngPath = path.join(mobileRoot, "node_modules", "react-native-gesture-handler");
 
-// Symlink-style hints for Metro (still helpful for some graph edges).
+// Real package roots — mobile/node_modules/@clerk is not populated in this monorepo.
 config.resolver = {
   ...config.resolver,
   extraNodeModules: {
@@ -23,13 +55,19 @@ config.resolver = {
     "react-dom": path.join(mobileRoot, "node_modules/react-dom"),
     "react-native": path.join(mobileRoot, "node_modules/react-native"),
     "react-native-gesture-handler": rngPath,
-    "@clerk/expo": path.join(clerkScope, "expo"),
-    "@clerk/react": path.join(clerkScope, "react"),
-    "@clerk/clerk-js": path.join(clerkScope, "clerk-js"),
-    "@clerk/shared": path.join(clerkScope, "shared"),
-    "@clerk/backend": path.join(clerkScope, "backend"),
-    "@clerk/localizations": path.join(clerkScope, "localizations"),
-    "@clerk/types": path.join(clerkScope, "types"),
+    "@clerk/expo": resolvePackageRoot("@clerk/expo", ["node_modules", "@clerk", "expo"]),
+    "@clerk/react": resolvePackageRoot("@clerk/react", ["node_modules", "@clerk", "react"]),
+    "@clerk/clerk-js": clerkJsBrowserEntry
+      ? packageRootFromEntry(clerkJsBrowserEntry)
+      : path.join(repoRoot, "node_modules", "@clerk", "clerk-js"),
+    "@clerk/shared": resolvePackageRoot("@clerk/shared", ["node_modules", "@clerk", "shared"]),
+    "@clerk/backend": resolvePackageRoot("@clerk/backend", ["node_modules", "@clerk", "backend"]),
+    "@clerk/localizations": resolvePackageRoot("@clerk/localizations", [
+      "node_modules",
+      "@clerk",
+      "localizations",
+    ]),
+    "@clerk/types": resolvePackageRoot("@clerk/types", ["node_modules", "@clerk", "types"]),
   },
 };
 
@@ -68,14 +106,11 @@ const bareReactFamily = new Set([
 function tryForceClerk(moduleName, platform) {
   if (!moduleName.startsWith("@clerk/")) return null;
   try {
-    if (
-      moduleName === "@clerk/clerk-js" &&
-      (platform === "ios" || platform === "android")
-    ) {
-      const browserEntry = resolveFromMobile("@clerk/clerk-js");
+    // Metro sometimes resolves with platform null / "native". Only web wants DOM clerk.js.
+    if (moduleName === "@clerk/clerk-js" && platform !== "web" && clerkJsNativeEntry) {
       return {
         type: "sourceFile",
-        filePath: path.join(path.dirname(browserEntry), "clerk.native.js"),
+        filePath: clerkJsNativeEntry,
       };
     }
     return {
@@ -130,8 +165,20 @@ function tryForceModule(moduleName) {
 
 const previousResolveRequest = config.resolver.resolveRequest;
 const secureStoreShim = path.join(mobileRoot, "shims/expo-secure-store.js");
+const urlPolyfillAutoShim = path.join(
+  mobileRoot,
+  "shims/react-native-url-polyfill-auto.js",
+);
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (
+    platform !== "web" &&
+    (moduleName === "react-native-url-polyfill/auto" ||
+      moduleName === "react-native-url-polyfill/auto.js")
+  ) {
+    return { type: "sourceFile", filePath: urlPolyfillAutoShim };
+  }
+
   if (
     platform === "ios" &&
     (moduleName === "expo-secure-store" ||
