@@ -3,10 +3,24 @@ type BootFatalListener = () => void;
 let bootFatal: string | null = null;
 const listeners = new Set<BootFatalListener>();
 
+/** EAS paths wrap 4+ times on a phone and hide the useful frames. */
+function compactStackLine(line: string): string {
+  return line
+    .trim()
+    .replace(/\/Users\/expo\/workingdir\/build\/[^:\s]+\/main\.jsbundle/g, "main.jsbundle")
+    .replace(/\/Users\/[^:\s]+\/main\.jsbundle/g, "main.jsbundle");
+}
+
 export function formatBootError(error: unknown): string {
   if (error instanceof Error) {
-    const stack = error.stack?.split("\n").slice(0, 8).join("\n").trim();
-    return stack ? `${error.message}\n\n${stack}` : error.message;
+    const frames = (error.stack ?? "")
+      .split("\n")
+      .map(compactStackLine)
+      .filter(Boolean)
+      .slice(0, 16);
+    if (frames.length === 0) return error.message;
+    if (frames[0]?.includes(error.message)) return frames.join("\n");
+    return `${error.message}\n\n${frames.join("\n")}`;
   }
   return String(error ?? "Unknown error");
 }

@@ -205,4 +205,17 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
+// After Babel (including Reanimated), wrap each production module factory so a
+// boot TypeError reports the source path. Build 32 stacks are only Metro line
+// numbers; that hid the file for "undefined is not a function".
+const annotateTransformer = path.join(mobileRoot, "metro-eval-annotate-transformer.js");
+const previousBabelTransformer = config.transformer?.babelTransformerPath;
+if (previousBabelTransformer && previousBabelTransformer !== annotateTransformer) {
+  process.env.NC_INNER_BABEL_TRANSFORMER = previousBabelTransformer;
+}
+config.transformer = {
+  ...config.transformer,
+  babelTransformerPath: annotateTransformer,
+};
+
 module.exports = config;

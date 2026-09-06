@@ -8,7 +8,7 @@ export function BootFailedScreen({ message }: { message: string }) {
     <View style={bootSurfaceStyles.centered}>
       <Text style={bootSurfaceStyles.title}>Could not start</Text>
       <ScrollView
-        style={{ alignSelf: "stretch", maxHeight: 280 }}
+        style={{ alignSelf: "stretch", maxHeight: 360 }}
         contentContainerStyle={{ paddingBottom: 8 }}
       >
         <Text style={bootSurfaceStyles.body}>{message}</Text>
