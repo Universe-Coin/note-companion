@@ -68,6 +68,7 @@ config.resolver = {
       "localizations",
     ]),
     "@clerk/types": resolvePackageRoot("@clerk/types", ["node_modules", "@clerk", "types"]),
+    "expo-glass-effect": path.join(mobileRoot, "shims/expo-glass-effect-pkg"),
   },
 };
 
@@ -84,10 +85,15 @@ config.resolver.blockList = [
   /\.\.\/.+\/node_modules\/react-native\//,
   /\.\.\/.+\/node_modules\/react-native-gesture-handler\//,
   /\.\.\/.+\/node_modules\/@clerk\//,
+  /node_modules[/\\]expo-glass-effect[/\\]/,
 ];
 
 // withNativeWind → withCssInterop merges resolver but can still leave duplicate React on web.
 config = withNativeWind(config, { input: "./global.css" });
+config.resolver.extraNodeModules = {
+  ...config.resolver.extraNodeModules,
+  "expo-glass-effect": path.join(mobileRoot, "shims/expo-glass-effect-pkg"),
+};
 
 const bareReactFamily = new Set([
   "react",
@@ -174,7 +180,14 @@ const cssInteropStylesheetShim = path.join(
   mobileRoot,
   "shims/css-interop-native-stylesheet.js",
 );
-const expoGlassEffectShim = path.join(mobileRoot, "shims/expo-glass-effect.js");
+const expoGlassEffectShim = path.join(
+  mobileRoot,
+  "shims/expo-glass-effect-pkg/index.js",
+);
+const createNativeStackNavigatorShim = path.join(
+  mobileRoot,
+  "shims/create-native-stack-navigator.js",
+);
 
 function isExpoRouterToast(context, moduleName) {
   if (
@@ -204,6 +217,39 @@ function isCssInteropNativeStylesheet(context, moduleName) {
   return false;
 }
 
+function isCreateNativeStackNavigator(context, moduleName) {
+  const name = String(moduleName || "").replace(/\\/g, "/");
+  if (name.includes("shims/create-native-stack-navigator")) {
+    return false;
+  }
+  if (
+    name.endsWith("fork/native-stack/createNativeStackNavigator") ||
+    name.endsWith("fork/native-stack/createNativeStackNavigator.js")
+  ) {
+    return true;
+  }
+  if (
+    name === "./createNativeStackNavigator" ||
+    name === "./createNativeStackNavigator.js"
+  ) {
+    const origin = (context.originModulePath || "").replace(/\\/g, "/");
+    return origin.includes("expo-router") && origin.includes("native-stack");
+  }
+  return false;
+}
+
+function isExpoGlassEffect(moduleName) {
+  const name = String(moduleName || "").replace(/\\/g, "/");
+  if (name.includes("shims/expo-glass-effect")) {
+    return false;
+  }
+  return (
+    name === "expo-glass-effect" ||
+    name.startsWith("expo-glass-effect/") ||
+    name.includes("/expo-glass-effect/")
+  );
+}
+
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (
     platform !== "web" &&
@@ -221,10 +267,11 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     return { type: "sourceFile", filePath: cssInteropStylesheetShim };
   }
 
-  if (
-    platform !== "web" &&
-    (moduleName === "expo-glass-effect" || moduleName.startsWith("expo-glass-effect/"))
-  ) {
+  if (platform !== "web" && isCreateNativeStackNavigator(context, moduleName)) {
+    return { type: "sourceFile", filePath: createNativeStackNavigatorShim };
+  }
+
+  if (platform !== "web" && isExpoGlassEffect(moduleName)) {
     return { type: "sourceFile", filePath: expoGlassEffectShim };
   }
 
