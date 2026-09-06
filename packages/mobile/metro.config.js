@@ -174,6 +174,7 @@ const cssInteropStylesheetShim = path.join(
   mobileRoot,
   "shims/css-interop-native-stylesheet.js",
 );
+const expoGlassEffectShim = path.join(mobileRoot, "shims/expo-glass-effect.js");
 
 function isExpoRouterToast(context, moduleName) {
   if (
@@ -218,6 +219,13 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 
   if (platform !== "web" && isCssInteropNativeStylesheet(context, moduleName)) {
     return { type: "sourceFile", filePath: cssInteropStylesheetShim };
+  }
+
+  if (
+    platform !== "web" &&
+    (moduleName === "expo-glass-effect" || moduleName.startsWith("expo-glass-effect/"))
+  ) {
+    return { type: "sourceFile", filePath: expoGlassEffectShim };
   }
 
   if (
