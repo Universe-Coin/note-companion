@@ -169,6 +169,39 @@ const urlPolyfillAutoShim = path.join(
   mobileRoot,
   "shims/react-native-url-polyfill-auto.js",
 );
+const expoRouterToastShim = path.join(mobileRoot, "shims/expo-router-toast.js");
+const cssInteropStylesheetShim = path.join(
+  mobileRoot,
+  "shims/css-interop-native-stylesheet.js",
+);
+
+function isExpoRouterToast(context, moduleName) {
+  if (
+    moduleName === "expo-router/build/views/Toast" ||
+    moduleName === "expo-router/build/views/Toast.js"
+  ) {
+    return true;
+  }
+  if (moduleName === "./Toast" || moduleName === "./Toast.js") {
+    const origin = context.originModulePath || "";
+    return origin.includes(`${path.sep}expo-router${path.sep}`) && origin.includes("views");
+  }
+  return false;
+}
+
+function isCssInteropNativeStylesheet(context, moduleName) {
+  if (
+    moduleName === "react-native-css-interop/dist/runtime/native/stylesheet" ||
+    moduleName === "react-native-css-interop/dist/runtime/native/stylesheet.js"
+  ) {
+    return true;
+  }
+  if (moduleName === "./stylesheet" || moduleName === "./stylesheet.js") {
+    const origin = context.originModulePath || "";
+    return origin.includes(`${path.sep}react-native-css-interop${path.sep}`) && origin.includes("native");
+  }
+  return false;
+}
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (
@@ -177,6 +210,14 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
       moduleName === "react-native-url-polyfill/auto.js")
   ) {
     return { type: "sourceFile", filePath: urlPolyfillAutoShim };
+  }
+
+  if (platform !== "web" && isExpoRouterToast(context, moduleName)) {
+    return { type: "sourceFile", filePath: expoRouterToastShim };
+  }
+
+  if (platform !== "web" && isCssInteropNativeStylesheet(context, moduleName)) {
+    return { type: "sourceFile", filePath: cssInteropStylesheetShim };
   }
 
   if (
