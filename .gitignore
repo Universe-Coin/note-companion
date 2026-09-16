@@ -19,6 +19,7 @@ main.js
 
 # Obsidian
 data.json
+.obsidian-dev-plugin/
 
 # macOS Finder
 .DS_Store
