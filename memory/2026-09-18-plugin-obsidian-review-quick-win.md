@@ -36,3 +36,5 @@ After this pass, `pnpm lint:obsidian-scan` on `packages/plugin` is 0 errors / 0 
 Cause: `.github/workflows/obsidian-review-lint.yml` used `cache: npm` + `npm ci` (“scanner compatibility”), but this repo is pnpm-only (`pnpm-lock.yaml`, `packageManager: pnpm@10.8.1`). The community scanner does not run this workflow; it clones source and runs its own ESLint.
 
 Fix: install with `pnpm/action-setup@v4` + `cache: pnpm` + `pnpm install --frozen-lockfile`, then `pnpm lint:obsidian-scan`, `pnpm lint:css`, `pnpm build`. Node 20 deprecation on checkout/setup-node v4 is a runner warning, not this failure.
+
+[Manual Plugin Release #132](https://github.com/Nexus-JPF/note-companion/actions/runs/35412068044/job/105813512036) hit the same `cache: npm` error in 9s. `.github/workflows/manual-release.yml` installed pnpm after setup-node, then ran `npm ci` / `npm run build`. Fix: pnpm first, `cache: pnpm`, one `pnpm install --frozen-lockfile`, `pnpm --filter @file-organizer/release-notes build`, `pnpm build`. No other workflows still use `npm ci`.
