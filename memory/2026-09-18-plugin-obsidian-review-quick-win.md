@@ -26,3 +26,13 @@ pnpm lint:obsidian-scan
 pnpm --filter @file-organizer/plugin test
 ```
 After this pass, `pnpm lint:obsidian-scan` on `packages/plugin` is 0 errors / 0 warnings. Preview the community directory scan before the next release.
+
+## CI (2026-09-18)
+
+[Obsidian review lint #83](https://github.com/Nexus-JPF/note-companion/actions/runs/35411518611/job/105811927638) failed in 10s on `actions/setup-node@v4`:
+
+`Dependencies lock file is not found … Supported file patterns: package-lock.json, npm-shrinkwrap.json, yarn.lock`
+
+Cause: `.github/workflows/obsidian-review-lint.yml` used `cache: npm` + `npm ci` (“scanner compatibility”), but this repo is pnpm-only (`pnpm-lock.yaml`, `packageManager: pnpm@10.8.1`). The community scanner does not run this workflow; it clones source and runs its own ESLint.
+
+Fix: install with `pnpm/action-setup@v4` + `cache: pnpm` + `pnpm install --frozen-lockfile`, then `pnpm lint:obsidian-scan`, `pnpm lint:css`, `pnpm build`. Node 20 deprecation on checkout/setup-node v4 is a runner warning, not this failure.
