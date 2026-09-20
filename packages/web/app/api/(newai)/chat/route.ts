@@ -36,6 +36,7 @@ import {
   isChatWebSearchEnabled,
 } from '@/lib/chat/chat-web-search';
 import { getChatResponsesProviderOptions } from '@/lib/chat/chat-openai-options';
+import { parseUnifiedContextJson } from '@/lib/chat/unified-context';
 import { buildChatToolsForMode } from './tools';
 
 export const maxDuration = 300; // Allow for complex multi-step tool calls and long conversations
@@ -251,27 +252,27 @@ export async function POST(req: NextRequest) {
               newUnifiedContext.substring(0, 500)
             );
 
-            // Try to extract JSON from the string (may have editor context appended)
-            // Look for JSON object at the start
-            let jsonStr = newUnifiedContext.trim();
-            let editorContext = '';
+            const extracted = parseUnifiedContextJson(newUnifiedContext);
+            const jsonStr = extracted.contextItems
+              ? JSON.stringify(extracted.contextItems)
+              : newUnifiedContext.trim();
+            const editorContext = extracted.extraText;
 
-            // Check if there's editor context after the JSON
-            const editorContextMatch = jsonStr.match(/^(\{.*?\})\s*\n\n(.*)$/s);
-            if (editorContextMatch) {
-              jsonStr = editorContextMatch[1];
-              editorContext = editorContextMatch[2];
+            if (extracted.contextItems) {
               console.log(
-                `[Chat API] Extracted JSON (${jsonStr.length} chars) and editor context (${editorContext.length} chars)`
+                `[Chat API] Extracted context JSON (${jsonStr.length} chars) and extra text (${editorContext.length} chars)`
               );
             } else {
               console.log(
-                `[Chat API] No editor context found, treating entire string as JSON`
+                `[Chat API] No JSON object found in unified context, treating as plain text`
               );
             }
 
             try {
-              const contextItems = JSON.parse(jsonStr);
+              if (!extracted.contextItems) {
+                throw new Error('No JSON object in unified context');
+              }
+              const contextItems = extracted.contextItems as any;
               parsedContextItemsForHints = contextItems as Record<
                 string,
                 unknown
