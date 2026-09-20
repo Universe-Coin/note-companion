@@ -212,6 +212,31 @@ describe('Chat API Route', () => {
     expect(streamOptions.tools?.web_search_preview).toBeDefined();
   });
 
+  it('uses non-search path when the user pastes a YouTube URL', async () => {
+    const mockRequest = new NextRequest('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'user',
+            content:
+              'Summarize this: https://www.youtube.com/watch?v=1vzes3R8xhA',
+          },
+        ],
+      }),
+      headers: {
+        'x-user-id': 'test-user',
+      },
+    });
+
+    await POST(mockRequest);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(streamText).toHaveBeenCalled();
+    const streamOptions = (streamText as jest.Mock).mock.calls[0][0];
+    expect(streamOptions.tools?.web_search_preview).toBeUndefined();
+  });
+
   it('uses non-search path when enableChatWebSearch is false', async () => {
     const mockRequest = new NextRequest('http://localhost:3000/api/chat', {
       method: 'POST',

@@ -12,6 +12,7 @@ import { getModel, getResponsesModel } from '@/lib/models';
 import {
   buildChatSystemPrompt,
   computeChatPromptHints,
+  lastUserMessageHasYoutubeUrl,
 } from '@/lib/prompts/chat-prompt';
 import {
   applyYoutubeToolDedupToCoreMessages,
@@ -81,8 +82,13 @@ export async function POST(req: NextRequest) {
           requestedMaxSteps: requestedMaxStepsRaw,
         } = await req.json();
 
+        // YouTube URLs need getYoutubeVideoId (transcript), not web search.
+        // Search + temporal guidance steers the model away from the tool, so
+        // "summarize this youtube.com/watch?v=…" fails even when captions exist.
         const shouldUseSearch =
-          isChatWebSearchEnabled() && enableChatWebSearch !== false;
+          isChatWebSearchEnabled() &&
+          enableChatWebSearch !== false &&
+          !lastUserMessageHasYoutubeUrl(messages);
         const deepSearch = isChatDeepSearchEnabled();
 
         console.log('[Chat API] Web search config', {
