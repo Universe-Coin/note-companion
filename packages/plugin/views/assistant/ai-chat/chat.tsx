@@ -1502,10 +1502,10 @@ export const ChatComponent: React.FC<ChatComponentProps> = ({
   };
 
   const handleCancelGeneration = () => {
-    stop();
+    void stop();
   };
 
-  const handleTiptapChange = async (newContent: string) => {
+  const handleTiptapChange = (newContent: string) => {
     setInput(newContent);
   };
 
@@ -1950,7 +1950,7 @@ export const ChatComponent: React.FC<ChatComponentProps> = ({
                         key={toolInvocation.toolCallId}
                         toolInvocation={toToolInvocation(toolInvocation)}
                         addToolResult={({ toolCallId, result }) => {
-                          addToolOutput({
+                          void addToolOutput({
                             tool: toolInvocation.toolName || "unknown",
                             toolCallId,
                             output: result,
@@ -2055,7 +2055,7 @@ export const ChatComponent: React.FC<ChatComponentProps> = ({
             <EditorContextBadge context={editorContext} onClear={clearFrozen} />
             <Tiptap
               value={input}
-              onChange={(content) => { void handleTiptapChange(content); }}
+              onChange={handleTiptapChange}
               onKeyDown={handleKeyDown}
               editorRef={tiptapEditorRef}
             />

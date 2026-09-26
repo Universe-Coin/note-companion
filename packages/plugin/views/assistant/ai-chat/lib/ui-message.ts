@@ -34,7 +34,7 @@ export function getMessageText(message: {
   if (Array.isArray(message.parts) && message.parts.length > 0) {
     return message.parts
       .filter(part => part.type === "text" && typeof part.text === "string")
-      .map(part => part.text as string)
+      .map(part => part.text)
       .join("");
   }
 
@@ -67,7 +67,7 @@ export function getFileParts(message: {
     .filter(attachment => typeof attachment?.url === "string")
     .map(attachment => ({
       type: "file" as const,
-      url: attachment.url as string,
+      url: attachment.url,
       mediaType:
         attachment.mediaType ||
         attachment.contentType ||
