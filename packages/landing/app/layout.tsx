@@ -3,14 +3,10 @@ import './globals.css';
 import { Metadata } from 'next';
 import Providers from './providers';
 import { OrganizationSchema } from '@/components/organization-schema';
+import { getSiteBaseUrl } from '@/lib/site-url';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'https://notecompanion.ai')
-  ),
+  metadataBase: new URL(getSiteBaseUrl()),
   title: {
     default: 'Note Companion',
     template: '%s | Note Companion',

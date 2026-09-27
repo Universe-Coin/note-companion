@@ -11,20 +11,36 @@ import Image from 'next/image';
 import { YouTubeEmbed } from '@/components/youtube-embed';
 import { SoftwareApplicationSchema } from '@/components/software-application-schema';
 import { FaqPageSchema } from '@/components/faq-page-schema';
+import { HOME_OG_IMAGE_PATH } from '@/lib/site-url';
+
+const homeDescription =
+  'Achieve seamless meeting notes, instant handwriting digitization, and the smartest AI chat for your Obsidian workflow. One tool, endless possibilities.';
 
 export const metadata: Metadata = {
   title: 'Your AI-powered Knowledge Partner',
-  description:
-    'Achieve seamless meeting notes, instant handwriting digitization, and the smartest AI chat for your Obsidian workflow. One tool, endless possibilities.',
+  description: homeDescription,
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    siteName: 'Note Companion',
     title: 'Note Companion — Your AI-powered Knowledge Partner',
-    description:
-      'Achieve seamless meeting notes, instant handwriting digitization, and the smartest AI chat for your Obsidian workflow. One tool, endless possibilities.',
+    description: homeDescription,
+    images: [
+      {
+        url: HOME_OG_IMAGE_PATH,
+        alt: 'Note Companion — AI for Obsidian',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Note Companion — Your AI-powered Knowledge Partner',
-    description:
-      'Achieve seamless meeting notes, instant handwriting digitization, and the smartest AI chat for your Obsidian workflow. One tool, endless possibilities.',
+    description: homeDescription,
+    images: [HOME_OG_IMAGE_PATH],
   },
 };
 

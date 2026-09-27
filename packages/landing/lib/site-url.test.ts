@@ -1,4 +1,4 @@
-import { getSiteBaseUrl } from './markdown-response';
+import { getSiteBaseUrl } from './site-url';
 
 describe('getSiteBaseUrl', () => {
   const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
