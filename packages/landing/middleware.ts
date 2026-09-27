@@ -1,18 +1,37 @@
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from 'next/server';
+import { resolveAgentMarkdownRoute } from '@/lib/agent/markdown-routing';
+import { markdownResponse } from '@/lib/agent/markdown-response';
+import { shouldSkipMiddleware } from '@/lib/agent/routes';
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (shouldSkipMiddleware(pathname)) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
+  const route = resolveAgentMarkdownRoute(
+    pathname,
+    request.headers.get('accept')
+  );
+
+  if (route.action === 'respond') {
+    return markdownResponse(route.body, route.status);
+  }
+
+  const response = NextResponse.next();
+  if (pathname === '/') {
+    response.headers.set('Vary', 'Accept');
+  }
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

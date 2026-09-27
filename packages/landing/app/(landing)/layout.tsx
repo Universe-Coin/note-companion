@@ -10,7 +10,7 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : 'https://www.notecompanion.ai');
+    : 'https://notecompanion.ai');
 
 export const metadata: Metadata = {
   title: {
@@ -121,6 +121,9 @@ export default function RootLayout({
                 <div className="flex items-center gap-4">
                   <Link href="/mobile" className="hover:text-foreground">
                     Mobile
+                  </Link>
+                  <Link href="/developers" className="hover:text-foreground">
+                    Developers
                   </Link>
                   <Link href="/privacy" className="hover:text-foreground">
                     Privacy
